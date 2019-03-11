@@ -9,24 +9,36 @@ namespace SpeckleRevitReboot.UI
 {
   public partial class SpeckleUiBindingsRevit : SpeckleUIBindings
   {
+
+    public SpeckleUiBindingsRevit( ) : base()
+    {
+      // TODO: 
+      // Scan the file for any existing clients and populate the MyClients list
+    }
+
     #region clients
-    public override void AddSender( ) { }
-    public override void AddReceiver( ) { }
-    public override void RemoveSender( ) { }
-    public override void RemoveReceier( ) { }
+    public override void AddSender( string args ) { }
+    public override void AddReceiver( string args ) { }
+    public override void RemoveSender( string args ) { }
+    public override void RemoveReceiver( string args ) { }
     #endregion
 
-    public override void BakeReceiver( )
+    public override void BakeReceiver( string args )
     {
       throw new NotImplementedException();
     }
 
-    public override void AddObjectsToSender( )
+    public override void AddObjectsToSender( string args )
     {
       throw new NotImplementedException();
     }
 
-    public override void RemoveObjectsFromSender( )
+    public override void RemoveObjectsFromSender( string args )
+    {
+      throw new NotImplementedException();
+    }
+
+    public override string GetFileClients( )
     {
       throw new NotImplementedException();
     }
@@ -34,6 +46,11 @@ namespace SpeckleRevitReboot.UI
     public override string GetApplicationHostName( )
     {
       return "Revit";
+    }
+
+    public override string GetFileName( )
+    {
+      return "Somewhere in Revit. Not implemented :)";
     }
   }
 }

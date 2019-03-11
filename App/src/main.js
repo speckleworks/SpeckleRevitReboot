@@ -8,6 +8,12 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
 Vue.config.productionTip = false
 
+import VueTimeago from 'vue-timeago'
+Vue.use( VueTimeago, {
+  name: 'Timeago',
+  locale: 'en',
+} )
+
 // set up an event bus on the window, to be used by the SpeckleUiBindings class to send events here
 window.EventBus = new Vue( )
 window.store = store

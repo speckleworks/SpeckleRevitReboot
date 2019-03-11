@@ -6,7 +6,7 @@
         <span class="font-weight-light">{{$store.state.hostAppName}}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn color="primary" dark small absolute bottom right fab :ripple="false" @click.native='showAddNew=true'>
+      <v-btn color="primary" dark absolute bottom right fab :ripple="false" @click.native='showAddNew=true'>
         <v-icon>{{showAddNew ? "close" : "add"}}</v-icon>
       </v-btn>
     </v-toolbar>
@@ -14,26 +14,29 @@
       <NewReceiver :is-visible='showAddNew' @close='showAddNew=false'>
       </NewReceiver>
     </v-dialog>
-      <v-content>
-        <v-container grid-list-md text-xs-center>
-          <v-layout row wrap>
-            <v-flex xs12>
-              // TODO: Add clients
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-content>
+    <v-content>
+      <v-container grid-list-md text-xs-center pa-0 mt-4>
+        <v-layout row wrap>
+          <v-flex xs12>
+            <Client v-for='client in $store.state.clients' :key='client.streamId + ":" + client.AccountId' :client='client '>
+            </Client>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-content>
   </v-app>
 </template>
 <script>
 import HelloWorld from './components/HelloWorld'
 import NewReceiver from './components/NewReceiver.vue'
+import Client from './components/Client.vue'
 
 export default {
   name: 'App',
   components: {
     HelloWorld,
-    NewReceiver
+    NewReceiver,
+    Client
   },
   data( ) {
     return {
@@ -51,6 +54,7 @@ export default {
 
     this.$store.dispatch( 'getAccounts' )
     this.$store.dispatch( 'getApplicationHostName' )
+    this.$store.dispatch( 'getExistingClients' )
   }
 }
 </script>

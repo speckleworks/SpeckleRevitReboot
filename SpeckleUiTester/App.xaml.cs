@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Newtonsoft.Json;
 using SpeckleUiBase;
 
 namespace SpeckleUiTester
@@ -26,24 +27,31 @@ namespace SpeckleUiTester
   /// </summary>
   public class TestBindings : SpeckleUIBindings
   {
-    public override void AddObjectsToSender( )
+
+    public TestBindings( ) : base()
+    {
+    }
+
+    public override void AddObjectsToSender( string args )
     {
       throw new NotImplementedException();
     }
 
-    public override void AddReceiver( )
+    public override void AddReceiver( string _args )
+    {
+      dynamic args = JsonConvert.DeserializeObject( _args );
+      //var copy = args;
+      myClients.Add( args );
+    }
+
+    public override void AddSender( string args )
     {
       throw new NotImplementedException();
     }
 
-    public override void AddSender( )
+    public override void BakeReceiver( string args )
     {
-      throw new NotImplementedException();
-    }
-
-    public override void BakeReceiver( )
-    {
-      throw new NotImplementedException();
+      //throw new NotImplementedException();
     }
 
     public override string GetApplicationHostName( )
@@ -51,19 +59,48 @@ namespace SpeckleUiTester
       return "UI Tester";
     }
 
-    public override void RemoveObjectsFromSender( )
+    public override string GetFileName( )
+    {
+      return "Somewhere in Memory. Not implemented :)";
+    }
+
+    public override string GetDocumentId( )
+    {
+      return "In memory testing!";
+    }
+
+    public override string GetDocumentLocation( )
+    {
+      return "RAM or SWAP";
+    }
+
+
+    public override string GetFileClients( )
+    {
+      return JsonConvert.SerializeObject( myClients );
+    }
+
+
+    public override void RemoveObjectsFromSender( string args )
     {
       throw new NotImplementedException();
     }
 
-    public override void RemoveReceier( )
+    public override void RemoveReceiver( string args )
     {
-      throw new NotImplementedException();
+      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      try
+      {
+        var index = myClients.FindIndex( acc => acc._id == client._id );
+        myClients.RemoveAt( index );
+      }
+      catch ( Exception e ) { }
     }
 
-    public override void RemoveSender( )
+    public override void RemoveSender( string args )
     {
       throw new NotImplementedException();
     }
   }
+
 }
