@@ -1,12 +1,10 @@
 ## Structure
 
-SpeckleCore - submodule of Speckle .net core sdk
-SpeckleRevitReboot - the main beast containing revit logics
-SpeckleRevitUiBase - submodule, the base ui. a cefsharp based app. see notes here: https://github.com/didimitrie/SpeckleUi
+- `SpeckleCore` - submodule of Speckle .net core sdk
+- `SpeckleRevitReboot` - the main beast containing revit logics
+- `SpeckleRevitUiBase` - submodule, the base ui. a cefsharp based app. see notes [here](https://github.com/didimitrie/SpeckleUi).
 
 Note: this repo should have nothing to do with an object model (object definitions). Those should be grouped under a speckle kit.
-
-
 
 ## Generic dev notes:
 
@@ -62,3 +60,9 @@ let accounts = JSON.parse( res )
 Let's try and keep those as much as possible in the store...
 
 Extra notes: the app url is hard coded to `Browser.Address = @"http://10.211.55.2:8080/";` which should obvs be changed to something more reasonable on whatever env you're on.
+
+## The Revit External Event Handler
+
+We make sure the bindings are aware of the event handler and vice-versa. There's an `Action` queue in the bindings that should store all needed actions (interactions with Revit). See "bake receiver" functionality.
+
+The external event handler just iterates through that action queue and executes them all (sequentially) untill the list is empty. 
