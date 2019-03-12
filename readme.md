@@ -1,9 +1,16 @@
+## Structure
+
+SpeckleCore - submodule of Speckle .net core sdk
+SpeckleRevitReboot - the main beast containing revit logics
+SpeckleRevitUiBase - submodule, the base ui. a cefsharp based app. see notes here: https://github.com/didimitrie/SpeckleUi
+
+Note: this repo should have nothing to do with an object model (object definitions). Those should be grouped under a speckle kit.
+
+
 
 ## Generic dev notes:
 
 Dynamo and/or Revit 2019 ships with cefsharp too, hence we need to maintain feature parity with its version (57). Do not use newer versions of cefsharp!
-
-SpeckleUiTester is just a wpf app to open up a window loading the ui. 
 
 SpeckleUiBase exposes an abstract class `SpeckleUiBindings` that should be implemented in all the custom applications where this ui will be present. It provides a couple default wrappers on common stuff:
 
