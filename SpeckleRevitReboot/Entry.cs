@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,7 +40,13 @@ namespace SpeckleRevitReboot
     {
       if ( !Launched )
       {
-        SpeckleWindow = new SpeckleUiWindow( new SpeckleUiBindingsRevit() );
+
+        var bindings = new SpeckleUiBindingsRevit( commandData.Application );
+        var eventHandler = ExternalEvent.Create( new SpeckleRevitExternalEventHandler( bindings ) );
+        bindings.Executor = eventHandler;
+
+
+        SpeckleWindow = new SpeckleUiWindow( bindings );
         SpeckleWindow.Show();
         Launched = true;
       }
@@ -48,6 +55,41 @@ namespace SpeckleRevitReboot
       SpeckleWindow.Focus();
 
       return Result.Succeeded;
+    }
+  }
+
+  public class SpeckleRevitExternalEventHandler : IExternalEventHandler
+  {
+
+    public SpeckleUiBindingsRevit myBindings { get; set; }
+
+    public SpeckleRevitExternalEventHandler( SpeckleUiBindingsRevit _uiBindings )
+    {
+      myBindings = _uiBindings;
+    }
+
+    public void Execute( UIApplication app )
+    {
+      var todo = myBindings.Queue[ 0 ];
+
+      try
+      {
+        todo();
+      }
+      catch ( Exception e )
+      {
+        Debug.WriteLine( e.Message );
+      }
+
+      myBindings.Queue.RemoveAt( 0 );
+
+      if ( myBindings.Queue.Count != 0 )
+        myBindings.Executor.Raise();
+    }
+
+    public string GetName( )
+    {
+      return "SpeckleSmackleSpockle";
     }
   }
 
