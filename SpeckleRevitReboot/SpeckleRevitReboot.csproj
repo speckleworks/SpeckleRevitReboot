@@ -95,24 +95,16 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SpeckleUiBase\SpeckleUiBase.csproj">
-      <Project>{ce40c576-3b05-443a-a1ba-cb3a796d0084}</Project>
-      <Name>SpeckleUiBase</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
     <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit" />
     <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2019" />
-
     <ItemGroup>
       <MySourceFiles Include="$(ProjectDir)bin\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(MySourceFiles)" DestinationFiles="@(MySourceFiles->'$(SolutionDir)\$(ConfigurationName)\%(RecursiveDir)%(Filename)%(Extension)')">
       <Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
     </Copy>
-
     <ItemGroup>
       <AllMySourceFiles Include="$(SolutionDir)\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
