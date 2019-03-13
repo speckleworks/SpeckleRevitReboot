@@ -8,15 +8,15 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
-using SpeckleRevitReboot.ClientStorage;
+using SpeckleRevit.ClientStorage;
 using SpeckleUiBase;
 
-namespace SpeckleRevitReboot.UI
+namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit : SpeckleUIBindings
   {
-    public UIApplication RevitApp;
-    public UIDocument CurrentDoc { get => RevitApp.ActiveUIDocument; }
+    public static UIApplication RevitApp;
+    public static UIDocument CurrentDoc { get => RevitApp.ActiveUIDocument; }
     
     /// <summary>
     /// Stores the actions for the ExternalEvent handler

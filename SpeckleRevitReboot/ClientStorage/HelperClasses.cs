@@ -7,7 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using Newtonsoft.Json;
 
-namespace SpeckleRevitReboot.ClientStorage
+namespace SpeckleRevit.ClientStorage
 {
   /// <summary>
   /// Wrapper class to manage the storage of speckle clients.

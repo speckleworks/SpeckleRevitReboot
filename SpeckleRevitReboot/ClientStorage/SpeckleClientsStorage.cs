@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 
-namespace SpeckleRevitReboot.ClientStorage
+namespace SpeckleRevit.ClientStorage
 {
   /// <summary>
   /// Manages the serialisation of speckle clients in a revit document.
