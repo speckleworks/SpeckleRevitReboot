@@ -47,6 +47,7 @@ namespace SpeckleRevitReboot
 
 
         SpeckleWindow = new SpeckleUiWindow( bindings );
+        // TODO: find a way to set the parent/owner of the speckle window so it minimises/maximises etc. together with the revit window.
         SpeckleWindow.Show();
         Launched = true;
       }
@@ -62,6 +63,7 @@ namespace SpeckleRevitReboot
   {
 
     public SpeckleUiBindingsRevit myBindings { get; set; }
+    public bool Running = false;
 
     public SpeckleRevitExternalEventHandler( SpeckleUiBindingsRevit _uiBindings )
     {
@@ -70,11 +72,13 @@ namespace SpeckleRevitReboot
 
     public void Execute( UIApplication app )
     {
-      var todo = myBindings.Queue[ 0 ];
+      Debug.WriteLine( "Current queue len is: " + myBindings.Queue.Count );
+      if ( Running ) return; // queue will run itself through
 
+      Running = true;
       try
       {
-        todo();
+        myBindings.Queue[ 0 ]();
       }
       catch ( Exception e )
       {
@@ -82,6 +86,7 @@ namespace SpeckleRevitReboot
       }
 
       myBindings.Queue.RemoveAt( 0 );
+      Running = false;
 
       if ( myBindings.Queue.Count != 0 )
         myBindings.Executor.Raise();
