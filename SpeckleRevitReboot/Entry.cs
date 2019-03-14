@@ -22,7 +22,7 @@ namespace SpeckleRevit
     public Result OnStartup( UIControlledApplication application )
     {
       var SpecklePanel = application.CreateRibbonPanel( "Speckle" );
-      var SpeckleButton = SpecklePanel.AddItem( new PushButtonData( "Speckle", "Speckle Revit", typeof( SpecklePlugin ).Assembly.Location, "SpeckleRevitReboot.SpeckleRevit" ) ) as PushButton;
+      var SpeckleButton = SpecklePanel.AddItem( new PushButtonData( "Speckle", "Speckle Revit", typeof( SpecklePlugin ).Assembly.Location, "SpeckleRevit.SpeckleRevitCommand" ) ) as PushButton;
 
       SpeckleButton.SetContextualHelp( new ContextualHelp( ContextualHelpType.Url, "https://speckle.works" ) );
 
@@ -31,7 +31,7 @@ namespace SpeckleRevit
   }
 
   [Transaction( TransactionMode.Manual )]
-  public class SpeckleRevit : IExternalCommand
+  public class SpeckleRevitCommand : IExternalCommand
   {
     public static bool Launched = false;
     public static SpeckleUiWindow SpeckleWindow;
