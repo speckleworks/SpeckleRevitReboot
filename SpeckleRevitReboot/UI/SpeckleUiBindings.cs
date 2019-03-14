@@ -8,6 +8,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
+using SpeckleCore;
 using SpeckleRevit.ClientStorage;
 using SpeckleUiBase;
 
@@ -17,7 +18,7 @@ namespace SpeckleRevit.UI
   {
     public static UIApplication RevitApp;
     public static UIDocument CurrentDoc { get => RevitApp.ActiveUIDocument; }
-    
+
     /// <summary>
     /// Stores the actions for the ExternalEvent handler
     /// </summary>
@@ -36,11 +37,37 @@ namespace SpeckleRevit.UI
       Queue = new List<Action>();
       ClientListWrapper = new SpeckleClientsWrapper();
 
+      InjectRevitInKits();
+
       RevitApp.ViewActivated += RevitApp_ViewActivated;
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
       RevitApp.Application.DocumentOpened += Application_DocumentOpened;
       RevitApp.Application.DocumentClosed += Application_DocumentClosed;
     }
+
+    /// <summary>
+    /// Injects the Revit app in any speckle kit Initialiser class that has a 'RevitApp' property defined. This is need for creating revit elements from that assembly without having hard references on the ui library.
+    /// </summary>
+    public void InjectRevitInKits( )
+    {
+      var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+      foreach ( var ass in assemblies )
+      {
+        var types = ass.GetTypes();
+        foreach ( var type in types )
+        {
+          if ( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          {
+            if ( type.GetProperties().Select( p => p.Name ).Contains( "RevitApp" ) )
+            {
+              
+              type.GetProperty( "RevitApp" ).SetValue( null, RevitApp );
+            }
+          }
+        }
+      }
+    }
+
 
     #region app events
     private void RevitApp_ViewActivated( object sender, Autodesk.Revit.UI.Events.ViewActivatedEventArgs e )
@@ -138,16 +165,9 @@ namespace SpeckleRevit.UI
     }
 
     #endregion
-    
+
     #region Client Actions
-    public override void BakeReceiver( string args )
-    {
-      Queue.Add( new Action( ( ) =>
-      {
-        Debug.WriteLine( "Should bake client: " + args );
-      } ) );
-      Executor.Raise();
-    }
+
 
     public override void AddObjectsToSender( string args )
     {
