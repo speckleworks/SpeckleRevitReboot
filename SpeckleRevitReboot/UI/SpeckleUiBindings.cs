@@ -31,13 +31,19 @@ namespace SpeckleRevit.UI
     /// </summary>
     public SpeckleClientsWrapper ClientListWrapper;
 
+    public List<SpeckleStream> LocalState;
+
     public SpeckleUiBindingsRevit( UIApplication _RevitApp ) : base()
     {
       RevitApp = _RevitApp;
       Queue = new List<Action>();
-      ClientListWrapper = new SpeckleClientsWrapper();
 
-      InjectRevitInKits();
+      ClientListWrapper = new SpeckleClientsWrapper();
+      LocalState = new List<SpeckleStream>();
+      // TODO: read local state from file
+
+      InjectRevitAppInKits();
+      InjectStateInKits();
 
       RevitApp.ViewActivated += RevitApp_ViewActivated;
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
@@ -48,7 +54,7 @@ namespace SpeckleRevit.UI
     /// <summary>
     /// Injects the Revit app in any speckle kit Initialiser class that has a 'RevitApp' property defined. This is need for creating revit elements from that assembly without having hard references on the ui library.
     /// </summary>
-    public void InjectRevitInKits( )
+    public void InjectRevitAppInKits( )
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
       foreach ( var ass in assemblies )
@@ -60,8 +66,31 @@ namespace SpeckleRevit.UI
           {
             if ( type.GetProperties().Select( p => p.Name ).Contains( "RevitApp" ) )
             {
-              
               type.GetProperty( "RevitApp" ).SetValue( null, RevitApp );
+            }
+          }
+        }
+      }
+    }
+
+    /// <summary>
+    /// Injects the current lolcal state in any speckle kit initialiser class that has a "LocalRevitState" property defined. 
+    /// This can then be used to determine what existing speckle baked objects exist in the current doc and either modify/delete whatever them in the conversion methods.
+    /// </summary>
+    public void InjectStateInKits()
+    {
+      var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+      foreach ( var ass in assemblies )
+      {
+        var types = ass.GetTypes();
+        foreach ( var type in types )
+        {
+          if ( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          {
+            if ( type.GetProperties().Select( p => p.Name ).Contains( "LocalRevitState" ) )
+            {
+              List<SpeckleStream> xxx = LocalState.Select( x => x ).ToList();
+              type.GetProperty( "LocalRevitState" ).SetValue( null, xxx );
             }
           }
         }
@@ -76,6 +105,7 @@ namespace SpeckleRevit.UI
       {
         DispatchStoreActionUi( "flushClients" );
         DispatchStoreActionUi( "getExistingClients" );
+        // TODO: Switch current local state to document
       }
     }
 
@@ -88,11 +118,20 @@ namespace SpeckleRevit.UI
     {
       DispatchStoreActionUi( "flushClients" );
       DispatchStoreActionUi( "getExistingClients" );
+      // TODO: Get current local state from document
     }
 
     //TODO: Potential handler for detecting changes in the sender, etc.
     private void Application_DocumentChanged( object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e )
     {
+      var transactionNames = e.GetTransactionNames();
+
+      // TODO: Delete the above elements in LocalState IF the transaction name is not speckle delete
+      var deleted = e.GetDeletedElementIds();
+       
+      // TODO: Mark as modified the above elements in LocalState IF the transaction name is not speckle bake
+      var modified = e.GetModifiedElementIds();
+
       return;
     }
     #endregion

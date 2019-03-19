@@ -55,7 +55,7 @@ namespace SpeckleRevit.ClientStorage
   }
 
   /// <summary>
-  /// Unique schema for 
+  /// Unique schema for... something. 
   /// </summary>
   static class DataStorageUniqueIdSchema
   {

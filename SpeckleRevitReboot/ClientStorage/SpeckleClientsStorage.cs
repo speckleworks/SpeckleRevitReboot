@@ -55,19 +55,17 @@ namespace SpeckleRevit.ClientStorage
       ds.SetEntity( speckleClientsEntity );
     }
 
-    private static DataStorage GetSettingsDataStorage(
-      Document doc )
+    private static DataStorage GetSettingsDataStorage( Document doc )
     {
       // Retrieve all data storages from project
       FilteredElementCollector collector = new FilteredElementCollector( doc );
-
+      
       var dataStorages = collector.OfClass( typeof( DataStorage ) );
 
       // Find setting data storage
       foreach ( DataStorage dataStorage in dataStorages )
       {
-        Entity settingIdEntity = dataStorage.GetEntity(
-            DataStorageUniqueIdSchema.GetSchema() );
+        Entity settingIdEntity = dataStorage.GetEntity( DataStorageUniqueIdSchema.GetSchema() );
 
         if ( !settingIdEntity.IsValid() ) continue;
 
