@@ -20,6 +20,7 @@ namespace SpeckleRevit.UI
       var previousStream = LocalState.FirstOrDefault( s => s.StreamId == ( string ) client.streamId );
       var stream = apiClient.StreamGetAsync( ( string ) client.streamId, "" ).Result.Resource;
 
+      InjectScaleInKits( GetScale( stream ) );
 
       // If it's the first time we bake this stream, create a local shadow copy
       if ( previousStream == null )
@@ -27,8 +28,6 @@ namespace SpeckleRevit.UI
         previousStream = new SpeckleStream() { StreamId = stream.StreamId, Objects = new List<SpeckleObject>() };
         LocalState.Add( previousStream );
       }
-
-      
 
       LocalContext.GetCachedObjects( stream.Objects, ( string ) client.account.RestApi );
       var payload = stream.Objects.Where( o => o.Type == "Placeholder" ).Select( obj => obj._id ).ToArray();
@@ -43,6 +42,7 @@ namespace SpeckleRevit.UI
 
       var (toDelete, ToAddOrMod) = DiffStreamStates( previousStream, stream );
 
+      // DELETION OF OLD OBJECTS
       if ( toDelete.Count() > 0 )
       {
         Queue.Add( new Action( ( ) =>
@@ -65,10 +65,7 @@ namespace SpeckleRevit.UI
         Executor.Raise();
       }
 
-      // TODO:
-      // 1. Get existing speckle-derived objects from this file
-      // 2. Identify, based on GUID, NOT ON HASH which are the ones that are DELELTED (removed from the stream), and delete them. 
-
+      // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
       Queue.Add( new Action( ( ) =>
       {
         using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake" ) )
@@ -78,24 +75,22 @@ namespace SpeckleRevit.UI
           var tempList = new List<SpeckleObject>();
           for ( int i = 0; i < ToAddOrMod.Count; i++ )
           {
-            // Convert or edit existing object (handled inside the ToNative methods)
-
-            //stream.Objects[ i ].Properties[ "__tempStreamId" ] = stream.StreamId;
-
             var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ] );
 
             var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
-
             myObject._id = ToAddOrMod[ i ]._id;
             myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
             myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
-            myObject.Properties[ "userModifed" ] = false;
-            
+            myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
+            myObject.Properties[ "userModified" ] = false;
+
             tempList.Add( myObject );
           }
 
           previousStream.Objects = tempList;
           InjectStateInKits();
+          
+          // TODO: Save state in doc
 
           t.Commit();
         }
@@ -104,9 +99,9 @@ namespace SpeckleRevit.UI
       Executor.Raise();
     }
 
-    private (List<SpeckleObject>, List<SpeckleObject>) DiffStreamStates(SpeckleStream Old, SpeckleStream New)
+    private (List<SpeckleObject>, List<SpeckleObject>) DiffStreamStates( SpeckleStream Old, SpeckleStream New )
     {
-      var ToDelete = Old.Objects.Where( obj => 
+      var ToDelete = Old.Objects.Where( obj =>
       {
         var appIdMatch = New.Objects.FirstOrDefault( x => x.ApplicationId == obj.ApplicationId );
         var idMatch = New.Objects.FirstOrDefault( x => x._id == obj._id );
@@ -116,5 +111,40 @@ namespace SpeckleRevit.UI
       var ToModOrAdd = New.Objects;
       return (ToDelete, ToModOrAdd);
     }
+
+    private double GetScale( SpeckleStream stream )
+    {
+      var units = ( ( string ) stream.BaseProperties.units ).ToLower();
+
+      // TODO: Check unit scales properly
+      switch ( units )
+      {
+        case "kilometers":
+          return 3.2808399 * 1000;
+
+        case "meters":
+          return 3.2808399;
+
+        case "centimeters":
+          return 0.032808399;
+
+        case "millimiters":
+          return 0.0032808399;
+
+        case "miles":
+          return 5280;
+
+        case "feet":
+          return 1;
+
+        case "inches":
+          return 0.0833333;
+
+        default:
+          return 3.2808399;
+      };
+    }
+
   }
+
 }

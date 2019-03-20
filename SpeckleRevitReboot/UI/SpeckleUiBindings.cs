@@ -51,6 +51,8 @@ namespace SpeckleRevit.UI
       RevitApp.Application.DocumentClosed += Application_DocumentClosed;
     }
 
+    #region Kit injection utils
+
     /// <summary>
     /// Injects the Revit app in any speckle kit Initialiser class that has a 'RevitApp' property defined. This is need for creating revit elements from that assembly without having hard references on the ui library.
     /// </summary>
@@ -77,7 +79,7 @@ namespace SpeckleRevit.UI
     /// Injects the current lolcal state in any speckle kit initialiser class that has a "LocalRevitState" property defined. 
     /// This can then be used to determine what existing speckle baked objects exist in the current doc and either modify/delete whatever them in the conversion methods.
     /// </summary>
-    public void InjectStateInKits()
+    public void InjectStateInKits( )
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
       foreach ( var ass in assemblies )
@@ -97,6 +99,29 @@ namespace SpeckleRevit.UI
       }
     }
 
+    /// <summary>
+    /// Injects a scale property to be used in conversion methods if needed.
+    /// </summary>
+    public void InjectScaleInKits( double scale )
+    {
+      var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+      foreach ( var ass in assemblies )
+      {
+        var types = ass.GetTypes();
+        foreach ( var type in types )
+        {
+          if ( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          {
+            if ( type.GetProperties().Select( p => p.Name ).Contains( "RevitScale" ) )
+            {
+              type.GetProperty( "RevitScale" ).SetValue( null, scale );
+            }
+          }
+        }
+      }
+    }
+
+    #endregion
 
     #region app events
     private void RevitApp_ViewActivated( object sender, Autodesk.Revit.UI.Events.ViewActivatedEventArgs e )
@@ -126,14 +151,23 @@ namespace SpeckleRevit.UI
     {
       var transactionNames = e.GetTransactionNames();
 
-      // TODO: Delete the above elements in LocalState IF the transaction name is not speckle delete
-      var deleted = e.GetDeletedElementIds();
-       
-      // TODO: Mark as modified the above elements in LocalState IF the transaction name is not speckle bake
-      var modified = e.GetModifiedElementIds();
+      if ( transactionNames.Contains( "Speckle Bake" ) || transactionNames.Contains( "Speckle Delete" ) ) return;
 
+      // TODO: Mark as modified the above elements in LocalState IF the transaction name is not speckle bake or speckle delete
+      var modified = e.GetModifiedElementIds();
+      var allStateObjects = ( from p in LocalState.SelectMany( s => s.Objects ) select p ).ToList();
+
+      foreach ( var id in modified )
+      {
+        var elUniqueId = CurrentDoc.Document.GetElement( id ).UniqueId;
+        var found = allStateObjects.FirstOrDefault( o => ( string ) o.Properties[ "revitUniqueId" ] == elUniqueId );
+        if ( found != null ) found.Properties[ "userModified" ] = true;
+      }
       return;
     }
+
+    public void MarkAsModified( ) { }
+
     #endregion
 
     #region client add/remove + serialisation/deserialisation
