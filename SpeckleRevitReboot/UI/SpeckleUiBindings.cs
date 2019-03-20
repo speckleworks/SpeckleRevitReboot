@@ -9,7 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using SpeckleCore;
-using SpeckleRevit.ClientStorage;
+using SpeckleRevit.Storage;
 using SpeckleUiBase;
 
 namespace SpeckleRevit.UI
@@ -130,7 +130,10 @@ namespace SpeckleRevit.UI
       {
         DispatchStoreActionUi( "flushClients" );
         DispatchStoreActionUi( "getExistingClients" );
+
         // TODO: Switch current local state to document
+        SpeckleStateManager.WriteState( e.PreviousActiveView.Document, LocalState );
+        LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
       }
     }
 
@@ -143,10 +146,13 @@ namespace SpeckleRevit.UI
     {
       DispatchStoreActionUi( "flushClients" );
       DispatchStoreActionUi( "getExistingClients" );
+
       // TODO: Get current local state from document
+      LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
     }
 
-    //TODO: Potential handler for detecting changes in the sender, etc.
+    // TODO: Handler for detecting changes in the sender
+    // TODO: Mark received objects as modified in local state (x)
     private void Application_DocumentChanged( object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e )
     {
       var transactionNames = e.GetTransactionNames();
@@ -156,17 +162,21 @@ namespace SpeckleRevit.UI
       // TODO: Mark as modified the above elements in LocalState IF the transaction name is not speckle bake or speckle delete
       var modified = e.GetModifiedElementIds();
       var allStateObjects = ( from p in LocalState.SelectMany( s => s.Objects ) select p ).ToList();
-
+      var changed = false;
       foreach ( var id in modified )
       {
         var elUniqueId = CurrentDoc.Document.GetElement( id ).UniqueId;
         var found = allStateObjects.FirstOrDefault( o => ( string ) o.Properties[ "revitUniqueId" ] == elUniqueId );
-        if ( found != null ) found.Properties[ "userModified" ] = true;
+        if ( found != null )
+        {
+          found.Properties[ "userModified" ] = true;
+          changed = true;
+        }
       }
-      return;
-    }
 
-    public void MarkAsModified( ) { }
+      if ( changed )
+        SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+    }
 
     #endregion
 
@@ -190,7 +200,7 @@ namespace SpeckleRevit.UI
         using ( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
         {
           t.Start();
-          SpeckleClientsStorage.WriteClients( CurrentDoc.Document, ClientListWrapper );
+          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
           t.Commit();
         }
       } ) );
@@ -214,7 +224,7 @@ namespace SpeckleRevit.UI
         using ( Transaction t = new Transaction( CurrentDoc.Document, "Removing Speckle Client" ) )
         {
           t.Start();
-          SpeckleClientsStorage.WriteClients( CurrentDoc.Document, ClientListWrapper );
+          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
           t.Commit();
         }
       } ) );
@@ -227,7 +237,7 @@ namespace SpeckleRevit.UI
     /// <returns></returns>
     public override string GetFileClients( )
     {
-      var myReadClients = SpeckleClientsStorage.ReadClients( CurrentDoc.Document );
+      var myReadClients = SpeckleClientsStorageManager.ReadClients( CurrentDoc.Document );
       if ( myReadClients == null )
         myReadClients = new SpeckleClientsWrapper();
 

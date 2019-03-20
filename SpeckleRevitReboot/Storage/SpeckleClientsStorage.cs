@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 
-namespace SpeckleRevit.ClientStorage
+namespace SpeckleRevit.Storage
 {
   /// <summary>
   /// Manages the serialisation of speckle clients in a revit document.
   /// </summary>
-  public static class SpeckleClientsStorage
+  public static class SpeckleClientsStorageManager
   {
-    readonly static Guid SCSID = new Guid( "{5D453471-1F20-44CE-B1D0-BBD2BDE4616A}" );
+    readonly static Guid ID = new Guid( "{5D453471-1F20-44CE-B1D0-BBD2BDE4616A}" );
 
     /// <summary>
     /// Returns the speckle clients present in the current document.
@@ -42,14 +42,12 @@ namespace SpeckleRevit.ClientStorage
 
       if ( ds == null ) ds = DataStorage.Create( doc );
 
-      var speckleWrapperEntity = new Entity( SpeckleClientsSchema.GetSchema() );
-
       Entity speckleClientsEntity = new Entity( SpeckleClientsSchema.GetSchema() );
 
       speckleClientsEntity.Set( "clients", wrap.GetStringList() as IList<string>);
 
-      Entity idEntity = new Entity( DataStorageUniqueIdSchema.GetSchema() );
-      idEntity.Set( "Id", SCSID );
+      Entity idEntity = new Entity( DSUniqueSchemaClientsStorage.GetSchema() );
+      idEntity.Set( "Id", ID );
 
       ds.SetEntity( idEntity );
       ds.SetEntity( speckleClientsEntity );
@@ -65,13 +63,13 @@ namespace SpeckleRevit.ClientStorage
       // Find setting data storage
       foreach ( DataStorage dataStorage in dataStorages )
       {
-        Entity settingIdEntity = dataStorage.GetEntity( DataStorageUniqueIdSchema.GetSchema() );
+        Entity settingIdEntity = dataStorage.GetEntity( DSUniqueSchemaClientsStorage.GetSchema() );
 
         if ( !settingIdEntity.IsValid() ) continue;
 
         var id = settingIdEntity.Get<Guid>( "Id" );
 
-        if ( !id.Equals( SCSID ) ) continue;
+        if ( !id.Equals( ID ) ) continue;
 
         return dataStorage;
       }

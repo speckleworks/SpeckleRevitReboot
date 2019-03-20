@@ -7,7 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using Newtonsoft.Json;
 
-namespace SpeckleRevit.ClientStorage
+namespace SpeckleRevit.Storage
 {
   /// <summary>
   /// Wrapper class to manage the storage of speckle clients.
@@ -55,9 +55,9 @@ namespace SpeckleRevit.ClientStorage
   }
 
   /// <summary>
-  /// Unique schema for... something. 
+  /// Unique schema for... something ¯\_(ツ)_/¯
   /// </summary>
-  static class DataStorageUniqueIdSchema
+  static class DSUniqueSchemaClientsStorage
   {
     static readonly Guid schemaGuid = new Guid( "{174C7EEE-EC5E-4A3F-894A-C801871AEDB8}" );
 
