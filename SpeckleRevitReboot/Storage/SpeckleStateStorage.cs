@@ -55,20 +55,29 @@ namespace SpeckleRevit.Storage
     public static List<SpeckleStream> ReadState( Autodesk.Revit.DB.Document doc )
     {
       var localStateEntity = GetStateEntity( doc );
-      if ( localStateEntity == null || !localStateEntity.IsValid() ) return null;
+      if ( localStateEntity == null || !localStateEntity.IsValid() )
+        return new List<SpeckleStream>();
 
       var serState = localStateEntity.Get<IList<string>>( "streams" );
       var myState = serState.Select( str => JsonConvert.DeserializeObject<SpeckleStream>( str ) ).ToList();
 
-      return myState;
+      return myState != null ? myState : new List<SpeckleStream>();
     }
 
     public static void WriteState( Autodesk.Revit.DB.Document doc, List<SpeckleStream> state )
     {
       var ds = GetStateDataStorage( doc );
 
-      if ( ds == null ) ds = DataStorage.Create( doc );
-
+      // TODO: The problem: 
+      // "Attempt to modify the model outside of transaction."
+      // Needs to be wrapped in a Action and sloshed in the queue. 
+      try
+      {
+        if ( ds == null ) ds = DataStorage.Create( doc );
+      }
+      catch ( Exception e )
+      {
+      }
       Entity speckleStateEntity = new Entity( SpeckleStateSchema.GetSchema() );
 
       var ls = state.Select( stream => JsonConvert.SerializeObject( stream ) ).ToList();

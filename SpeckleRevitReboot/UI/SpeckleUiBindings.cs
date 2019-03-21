@@ -40,7 +40,6 @@ namespace SpeckleRevit.UI
 
       ClientListWrapper = new SpeckleClientsWrapper();
       LocalState = new List<SpeckleStream>();
-      // TODO: read local state from file
 
       InjectRevitAppInKits();
       InjectStateInKits();
@@ -121,6 +120,12 @@ namespace SpeckleRevit.UI
       }
     }
 
+    public void ExecuteAction( Action a )
+    {
+      Queue.Add( a );
+      Executor.Raise();
+    }
+
     #endregion
 
     #region app events
@@ -132,8 +137,19 @@ namespace SpeckleRevit.UI
         DispatchStoreActionUi( "getExistingClients" );
 
         // TODO: Switch current local state to document
-        SpeckleStateManager.WriteState( e.PreviousActiveView.Document, LocalState );
-        LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
+        Queue.Add( new Action( ( ) =>
+        {
+          using ( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
+          {
+            t.Start();
+            LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
+            InjectStateInKits();
+            t.Commit();
+          }
+        } ) );
+        Executor.Raise();
+
+
       }
     }
 
@@ -148,7 +164,17 @@ namespace SpeckleRevit.UI
       DispatchStoreActionUi( "getExistingClients" );
 
       // TODO: Get current local state from document
-      LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
+      Queue.Add( new Action( ( ) =>
+      {
+        using ( Transaction t = new Transaction( CurrentDoc.Document, "Reading Local Speckle State" ) )
+        {
+          t.Start();
+          LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
+          InjectStateInKits();
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
     }
 
     // TODO: Handler for detecting changes in the sender
@@ -175,7 +201,18 @@ namespace SpeckleRevit.UI
       }
 
       if ( changed )
-        SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+      {
+        Queue.Add( new Action( ( ) =>
+        {
+          using ( Transaction t = new Transaction( CurrentDoc.Document, "Writing Local Speckle State" ) )
+          {
+            t.Start();
+            SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+            t.Commit();
+          }
+        } ) );
+        Executor.Raise();
+      }
     }
 
     #endregion

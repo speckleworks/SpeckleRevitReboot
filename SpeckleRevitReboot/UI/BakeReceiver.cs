@@ -89,8 +89,9 @@ namespace SpeckleRevit.UI
 
           previousStream.Objects = tempList;
           InjectStateInKits();
-          
+
           // TODO: Save state in doc
+          Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
 
           t.Commit();
         }
