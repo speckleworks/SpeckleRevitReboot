@@ -40,13 +40,18 @@ namespace SpeckleRevit
     {
       if ( !Launched )
       {
-
+        // Create a new speckle binding instance
         var bindings = new SpeckleUiBindingsRevit( commandData.Application );
+
+        // Create an external event handler to raise actions
         var eventHandler = ExternalEvent.Create( new SpeckleRevitExternalEventHandler( bindings ) );
-        bindings.Executor = eventHandler;
 
+        // Give it to our bindings so we can actually do stuff with revit
+        bindings.SetExecutorAndInit( eventHandler );
 
+        // Initialise the window
         SpeckleWindow = new SpeckleUiWindow( bindings );
+        
         // TODO: find a way to set the parent/owner of the speckle window so it minimises/maximises etc. together with the revit window.
         SpeckleWindow.Show();
         Launched = true;

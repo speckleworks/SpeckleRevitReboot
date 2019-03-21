@@ -14,6 +14,9 @@ using SpeckleUiBase;
 
 namespace SpeckleRevit.UI
 {
+  /// <summary>
+  /// Handles most of the revit specific implementations for any speckle-derived actions.
+  /// </summary>
   public partial class SpeckleUiBindingsRevit : SpeckleUIBindings
   {
     public static UIApplication RevitApp;
@@ -37,13 +40,35 @@ namespace SpeckleRevit.UI
     {
       RevitApp = _RevitApp;
       Queue = new List<Action>();
-
       ClientListWrapper = new SpeckleClientsWrapper();
+    }
+
+    /// <summary>
+    /// Sets the revit external event handler and intialises the rocket enginges.
+    /// </summary>
+    /// <param name="eventHandler"></param>
+    public void SetExecutorAndInit( ExternalEvent eventHandler )
+    {
+      Executor = eventHandler;
+
+      // LOCAL STATE
       LocalState = new List<SpeckleStream>();
+      Queue.Add( new Action( ( ) =>
+      {
+        using ( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
+        {
+          t.Start();
+          LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
+          InjectStateInKits();
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
 
+      // REVIT INJECTION
       InjectRevitAppInKits();
-      InjectStateInKits();
 
+      // GLOBAL EVENT HANDLERS
       RevitApp.ViewActivated += RevitApp_ViewActivated;
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
       RevitApp.Application.DocumentOpened += Application_DocumentOpened;
@@ -90,8 +115,7 @@ namespace SpeckleRevit.UI
           {
             if ( type.GetProperties().Select( p => p.Name ).Contains( "LocalRevitState" ) )
             {
-              List<SpeckleStream> xxx = LocalState.Select( x => x ).ToList();
-              type.GetProperty( "LocalRevitState" ).SetValue( null, xxx );
+              type.GetProperty( "LocalRevitState" ).SetValue( null, LocalState );
             }
           }
         }
@@ -287,7 +311,6 @@ namespace SpeckleRevit.UI
     #endregion
 
     #region Client Actions
-
 
     public override void AddObjectsToSender( string args )
     {
