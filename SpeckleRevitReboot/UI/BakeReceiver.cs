@@ -12,6 +12,12 @@ namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit
   {
+    /// <summary>
+    /// This function will bake the objects in the given receiver. Behaviour:
+    /// 1) Fresh bake: objects are created
+    /// 2) Diff bake: old objects are deleted, any overlapping objects (by applicationId) are either edited or left alone if not marked as having been user modified, new objects are created.
+    /// </summary>
+    /// <param name="args">Serialised client coming from the ui.</param>
     public override void BakeReceiver( string args )
     {
       var client = JsonConvert.DeserializeObject<dynamic>( args );
@@ -75,22 +81,28 @@ namespace SpeckleRevit.UI
           var tempList = new List<SpeckleObject>();
           for ( int i = 0; i < ToAddOrMod.Count; i++ )
           {
+
             var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ] );
 
-            var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
-            myObject._id = ToAddOrMod[ i ]._id;
-            myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-            myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
-            myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
-            myObject.Properties[ "userModified" ] = false;
+            // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
+            // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
+            if ( res is Element )
+            {
+              // creates a shadow copy of the baked object to store in our local state. 
+              var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
+              myObject._id = ToAddOrMod[ i ]._id;
+              myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
+              myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
+              myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
+              myObject.Properties[ "userModified" ] = false;
 
-            tempList.Add( myObject );
+              tempList.Add( myObject );
+            }
           }
 
+          // set the local state stream's object list, and inject it in the kits, persist it in the doc
           previousStream.Objects = tempList;
           InjectStateInKits();
-
-          // TODO: Save state in doc
           Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
 
           t.Commit();

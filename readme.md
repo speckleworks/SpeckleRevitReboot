@@ -1,3 +1,14 @@
+
+## Local State & Clients Serialisation
+
+Every time a stream is baked, this is reflected and stored in a local state that is serialised within the revit document itself. Same goes for clients. 
+
+The local state is injected in any kits that can accept it (and work with it - ideally all). 
+
+## Solution files
+
+There's two solutions, `SpeckleRevit` and `SpeckleRevitWithElements`. The latter adds a reference to the SpeckleElements project, which lives in its own separate repo [here](https://github.com/didimitrie/SpeckleElements). It's not added as a submodule as it's not a hard dependency.
+
 ## Structure
 
 - `SpeckleCore` - submodule of Speckle .net core sdk

@@ -64,6 +64,10 @@ namespace SpeckleRevit
     }
   }
 
+  /// <summary>
+  /// Speckle custom event invoker. Has a queue of actions that, in theory, this things should iterate through. 
+  /// Actions are added to the queue from the ui bindings (mostly) and then raised. 
+  /// </summary>
   public class SpeckleRevitExternalEventHandler : IExternalEventHandler
   {
 
