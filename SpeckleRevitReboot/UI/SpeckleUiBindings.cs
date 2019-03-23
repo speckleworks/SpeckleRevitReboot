@@ -337,8 +337,7 @@ namespace SpeckleRevit.UI
     public override string GetDocumentId( )
     {
       return GetDocHash( CurrentDoc.Document );
-      // NOTE: If project is copy pasted, it has the same unique id, so the below 
-      // is not reliable
+      // NOTE: If project is copy pasted, it has the same unique id, so the below is not reliable
       //return CurrentDoc.Document.ProjectInformation.UniqueId;
     }
 

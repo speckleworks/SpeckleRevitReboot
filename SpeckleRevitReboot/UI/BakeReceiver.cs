@@ -92,6 +92,7 @@ namespace SpeckleRevit.UI
               var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
               myObject._id = ToAddOrMod[ i ]._id;
               myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
+              myObject.Type = ToAddOrMod[ i ].Type;
               myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
               myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
               myObject.Properties[ "userModified" ] = false;
