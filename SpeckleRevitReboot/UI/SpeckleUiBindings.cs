@@ -73,6 +73,9 @@ namespace SpeckleRevit.UI
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
       RevitApp.Application.DocumentOpened += Application_DocumentOpened;
       RevitApp.Application.DocumentClosed += Application_DocumentClosed;
+
+      // TODO: Find a way to handle when document is closed via middle mouse click
+      // thus triggering the focus on a new project
     }
 
     #region Kit injection utils
@@ -172,8 +175,6 @@ namespace SpeckleRevit.UI
           }
         } ) );
         Executor.Raise();
-
-
       }
     }
 

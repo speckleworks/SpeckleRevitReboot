@@ -53,7 +53,7 @@ namespace SpeckleRevit.UI
       {
         Queue.Add( new Action( ( ) =>
         {
-          using ( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Delete" ) )
+          using ( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Delete (" + ( string ) client.streamId + ")" ) )
           {
             t.Start();
             foreach ( var obj in toDelete )
@@ -74,7 +74,7 @@ namespace SpeckleRevit.UI
       // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
       Queue.Add( new Action( ( ) =>
       {
-        using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake" ) )
+        using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake (" + ( string ) client.streamId + ")" ) )
         {
           t.Start();
 
@@ -99,6 +99,17 @@ namespace SpeckleRevit.UI
 
               tempList.Add( myObject );
             }
+
+            // TODO: Handle scenario when one object creates more objects. 
+            // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
+            if ( res is List<Element> )
+            {
+              foreach ( var elm in ( List<Element> ) res )
+              {
+                var myObject = new SpeckleObject();
+              }
+            }
+
           }
 
           // set the local state stream's object list, and inject it in the kits, persist it in the doc
@@ -113,6 +124,12 @@ namespace SpeckleRevit.UI
       Executor.Raise();
     }
 
+    /// <summary>
+    /// Diffs stream objects based on appId + _id non-matching.
+    /// </summary>
+    /// <param name="Old"></param>
+    /// <param name="New"></param>
+    /// <returns></returns>
     private (List<SpeckleObject>, List<SpeckleObject>) DiffStreamStates( SpeckleStream Old, SpeckleStream New )
     {
       var ToDelete = Old.Objects.Where( obj =>
@@ -126,6 +143,11 @@ namespace SpeckleRevit.UI
       return (ToDelete, ToModOrAdd);
     }
 
+    /// <summary>
+    /// Gets the scaling factor from a stream's units.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
     private double GetScale( SpeckleStream stream )
     {
       var units = ( ( string ) stream.BaseProperties.units ).ToLower();
