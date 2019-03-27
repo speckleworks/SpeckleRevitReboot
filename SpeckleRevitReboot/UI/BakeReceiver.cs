@@ -102,14 +102,24 @@ namespace SpeckleRevit.UI
 
             // TODO: Handle scenario when one object creates more objects. 
             // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
-            if ( res is List<Element> )
+            if ( res is System.Collections.IEnumerable )
             {
-              foreach ( var elm in ( List<Element> ) res )
+              int k = 0;
+              var xx = ( ( IEnumerable<object> ) res ).Cast<Element>();
+              foreach ( var elm in xx )
               {
                 var myObject = new SpeckleObject();
+                myObject._id = ToAddOrMod[ i ]._id;
+                myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
+                myObject.Type = ToAddOrMod[ i ].Type;
+                myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
+                myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
+                myObject.Properties[ "userModified" ] = false;
+                myObject.Properties[ "orderIndex" ] = k++; // keeps track of which elm it actually is
+
+                tempList.Add( myObject );
               }
             }
-
           }
 
           // set the local state stream's object list, and inject it in the kits, persist it in the doc

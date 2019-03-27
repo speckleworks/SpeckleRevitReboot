@@ -207,8 +207,9 @@ namespace SpeckleRevit.UI
     private void Application_DocumentChanged( object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e )
     {
       var transactionNames = e.GetTransactionNames();
-
-      if ( transactionNames.Contains( "Speckle Bake" ) || transactionNames.Contains( "Speckle Delete" ) ) return;
+      var foundKnownTransaction = transactionNames.FirstOrDefault( str => str.Contains( "Speckle" ) );
+      if ( foundKnownTransaction != null ) return;
+      //if ( transactionNames.Contains( "Speckle Bake" ) || transactionNames.Contains( "Speckle Delete" ) ) return;
 
       // TODO: Mark as modified the above elements in LocalState IF the transaction name is not speckle bake or speckle delete
       var modified = e.GetModifiedElementIds();
