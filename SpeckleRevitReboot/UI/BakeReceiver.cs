@@ -82,7 +82,9 @@ namespace SpeckleRevit.UI
           for ( int i = 0; i < ToAddOrMod.Count; i++ )
           {
 
-            var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ] );
+            var exc = new List<string>() { "SpeckleCoreGeometryDynamo"};
+
+            var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ], excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
 
             // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
             // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
