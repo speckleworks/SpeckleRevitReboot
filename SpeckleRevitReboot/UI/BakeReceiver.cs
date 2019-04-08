@@ -23,6 +23,14 @@ namespace SpeckleRevit.UI
       var client = JsonConvert.DeserializeObject<dynamic>( args );
       var apiClient = new SpeckleApiClient( ( string ) client.account.RestApi ) { AuthToken = ( string ) client.account.Token };
 
+      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      {
+        _id = (string) client._id,
+        loading = true,
+        loadingBlurb = "Getting stream from server..."
+      } ) );
+
+
       var previousStream = LocalState.FirstOrDefault( s => s.StreamId == ( string ) client.streamId );
       var stream = apiClient.StreamGetAsync( ( string ) client.streamId, "" ).Result.Resource;
 
@@ -47,6 +55,13 @@ namespace SpeckleRevit.UI
       }
 
       var (toDelete, ToAddOrMod) = DiffStreamStates( previousStream, stream );
+
+      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      {
+        _id = ( string ) client._id,
+        loading = true,
+        loadingBlurb = "Deleting " + toDelete.Count() + " objects."
+      } ) );
 
       // DELETION OF OLD OBJECTS
       if ( toDelete.Count() > 0 )
@@ -81,8 +96,15 @@ namespace SpeckleRevit.UI
           var tempList = new List<SpeckleObject>();
           for ( int i = 0; i < ToAddOrMod.Count; i++ )
           {
+            NotifyUi( "update-client", JsonConvert.SerializeObject( new
+            {
+              _id = ( string ) client._id,
+              loading = true,
+              isLoadingIndeterminate = false,
+              loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
+            } ) );
 
-            var exc = new List<string>() { "SpeckleCoreGeometryDynamo"};
+            var exc = new List<string>() { "SpeckleCoreGeometryDynamo" };
 
             var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ], excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
 
@@ -124,10 +146,26 @@ namespace SpeckleRevit.UI
             }
           }
 
+          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          {
+            _id = ( string ) client._id,
+            loading = true,
+            isLoadingIndeterminate = true,
+            loadingBlurb = string.Format( "Updating shadow state." )
+          } ) );
+
           // set the local state stream's object list, and inject it in the kits, persist it in the doc
           previousStream.Objects = tempList;
           InjectStateInKits();
           Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+
+          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          {
+            _id = ( string ) client._id,
+            loading = false,
+            isLoadingIndeterminate = true,
+            loadingBlurb = string.Format( "Done." )
+          } ) );
 
           t.Commit();
         }
@@ -192,7 +230,6 @@ namespace SpeckleRevit.UI
           return 3.2808399;
       };
     }
-
   }
 
 }
