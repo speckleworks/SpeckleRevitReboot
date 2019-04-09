@@ -87,11 +87,13 @@ namespace SpeckleRevit.UI
       }
 
       // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
-      Queue.Add( new Action( ( ) =>
-      {
 
-        var tempList = new List<SpeckleObject>();
-        for ( int i = 0; i < ToAddOrMod.Count; i++ )
+      var tempList = new List<SpeckleObject>();
+      int i = 0;
+      //for ( int i = 0; i < ToAddOrMod.Count; i++ )
+      foreach(var mySpkObj in ToAddOrMod)
+      {
+        Queue.Add( new Action( ( ) =>
         {
           NotifyUi( "update-client", JsonConvert.SerializeObject( new
           {
@@ -101,9 +103,8 @@ namespace SpeckleRevit.UI
             loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
           } ) );
 
-          var exc = new List<string>() { "SpeckleCoreGeometryDynamo" };
-
-          var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ], excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
+          var obj = ToAddOrMod[ i ];
+          var res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
 
           // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
           // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
@@ -111,9 +112,9 @@ namespace SpeckleRevit.UI
           {
             // creates a shadow copy of the baked object to store in our local state. 
             var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
-            myObject._id = ToAddOrMod[ i ]._id;
-            myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-            myObject.Type = ToAddOrMod[ i ].Type;
+            myObject._id = mySpkObj._id;
+            myObject.ApplicationId = mySpkObj.ApplicationId;
+            myObject.Type = mySpkObj.Type;
             myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
             myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
             myObject.Properties[ "userModified" ] = false;
@@ -130,9 +131,9 @@ namespace SpeckleRevit.UI
             foreach ( var elm in xx )
             {
               var myObject = new SpeckleObject();
-              myObject._id = ToAddOrMod[ i ]._id;
-              myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-              myObject.Type = ToAddOrMod[ i ].Type;
+              myObject._id = mySpkObj._id;
+              myObject.ApplicationId = mySpkObj.ApplicationId;
+              myObject.Type = mySpkObj.Type;
               myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
               myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
               myObject.Properties[ "userModified" ] = false;
@@ -141,8 +142,14 @@ namespace SpeckleRevit.UI
               tempList.Add( myObject );
             }
           }
-        }
 
+          i++;
+        } ) );
+        Executor.Raise();
+      }
+
+      Queue.Add( new Action( ( ) =>
+      {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
         {
           _id = ( string ) client._id,
@@ -167,6 +174,7 @@ namespace SpeckleRevit.UI
           isLoadingIndeterminate = true,
           loadingBlurb = string.Format( "Done." )
         } ) );
+
       } ) );
 
       Executor.Raise();
