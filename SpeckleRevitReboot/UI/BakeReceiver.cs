@@ -90,31 +90,31 @@ namespace SpeckleRevit.UI
 
       var tempList = new List<SpeckleObject>();
       int i = 0;
-      //for ( int i = 0; i < ToAddOrMod.Count; i++ )
-      //using ( var t = new Transaction( CurrentDoc.Document, "global bake" ) )
-      //{
-      //  t.Start();
-        foreach ( var mySpkObj in ToAddOrMod )
+      foreach ( var mySpkObj in ToAddOrMod )
+      {
+        Queue.Add( new Action( ( ) =>
         {
-          Queue.Add( new Action( ( ) =>
+          NotifyUi( "update-client", JsonConvert.SerializeObject( new
           {
-            NotifyUi( "update-client", JsonConvert.SerializeObject( new
-            {
-              _id = ( string ) client._id,
-              loading = true,
-              isLoadingIndeterminate = false,
-              loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
-            } ) );
+            _id = ( string ) client._id,
+            loading = true,
+            isLoadingIndeterminate = false,
+            loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
+          } ) );
 
-            var obj = ToAddOrMod[ i ];
-            var res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
+          object res;
+          using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake " + mySpkObj._id ) )
+          {
+            t.Start();
 
-          // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
-          // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
-          if ( res is Element )
+            res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
+
+            // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
+            // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
+            if ( res is Element )
             {
-            // creates a shadow copy of the baked object to store in our local state. 
-            var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
+              // creates a shadow copy of the baked object to store in our local state. 
+              var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
               myObject._id = mySpkObj._id;
               myObject.ApplicationId = mySpkObj.ApplicationId;
               myObject.Type = mySpkObj.Type;
@@ -125,9 +125,9 @@ namespace SpeckleRevit.UI
               tempList.Add( myObject );
             }
 
-          // TODO: Handle scenario when one object creates more objects. 
-          // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
-          if ( res is System.Collections.IEnumerable )
+            // TODO: Handle scenario when one object creates more objects. 
+            // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
+            if ( res is System.Collections.IEnumerable )
             {
               int k = 0;
               var xx = ( ( IEnumerable<object> ) res ).Cast<Element>();
@@ -142,16 +142,17 @@ namespace SpeckleRevit.UI
                 myObject.Properties[ "userModified" ] = false;
                 myObject.Properties[ "orderIndex" ] = k++; // keeps track of which elm it actually is
 
-              tempList.Add( myObject );
+                tempList.Add( myObject );
               }
             }
 
-            i++;
-          } ) );
-          Executor.Raise();
-        }
-      //  t.Commit();
-      //}
+            t.Commit();
+          }
+
+          i++;
+        } ) );
+        Executor.Raise();
+      }
 
       Queue.Add( new Action( ( ) =>
       {
