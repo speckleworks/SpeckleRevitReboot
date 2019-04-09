@@ -25,7 +25,7 @@ namespace SpeckleRevit.UI
 
       NotifyUi( "update-client", JsonConvert.SerializeObject( new
       {
-        _id = (string) client._id,
+        _id = ( string ) client._id,
         loading = true,
         loadingBlurb = "Getting stream from server..."
       } ) );
@@ -89,86 +89,84 @@ namespace SpeckleRevit.UI
       // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
       Queue.Add( new Action( ( ) =>
       {
-        using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake (" + ( string ) client.streamId + ")" ) )
+
+        var tempList = new List<SpeckleObject>();
+        for ( int i = 0; i < ToAddOrMod.Count; i++ )
         {
-          t.Start();
-
-          var tempList = new List<SpeckleObject>();
-          for ( int i = 0; i < ToAddOrMod.Count; i++ )
-          {
-            NotifyUi( "update-client", JsonConvert.SerializeObject( new
-            {
-              _id = ( string ) client._id,
-              loading = true,
-              isLoadingIndeterminate = false,
-              loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
-            } ) );
-
-            var exc = new List<string>() { "SpeckleCoreGeometryDynamo" };
-
-            var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ], excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
-
-            // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
-            // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
-            if ( res is Element )
-            {
-              // creates a shadow copy of the baked object to store in our local state. 
-              var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
-              myObject._id = ToAddOrMod[ i ]._id;
-              myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-              myObject.Type = ToAddOrMod[ i ].Type;
-              myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
-              myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
-              myObject.Properties[ "userModified" ] = false;
-
-              tempList.Add( myObject );
-            }
-
-            // TODO: Handle scenario when one object creates more objects. 
-            // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
-            if ( res is System.Collections.IEnumerable )
-            {
-              int k = 0;
-              var xx = ( ( IEnumerable<object> ) res ).Cast<Element>();
-              foreach ( var elm in xx )
-              {
-                var myObject = new SpeckleObject();
-                myObject._id = ToAddOrMod[ i ]._id;
-                myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-                myObject.Type = ToAddOrMod[ i ].Type;
-                myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
-                myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
-                myObject.Properties[ "userModified" ] = false;
-                myObject.Properties[ "orderIndex" ] = k++; // keeps track of which elm it actually is
-
-                tempList.Add( myObject );
-              }
-            }
-          }
-
           NotifyUi( "update-client", JsonConvert.SerializeObject( new
           {
             _id = ( string ) client._id,
             loading = true,
-            isLoadingIndeterminate = true,
-            loadingBlurb = string.Format( "Updating shadow state." )
+            isLoadingIndeterminate = false,
+            loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
           } ) );
 
-          // set the local state stream's object list, and inject it in the kits, persist it in the doc
-          previousStream.Objects = tempList;
-          InjectStateInKits();
-          Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+          var exc = new List<string>() { "SpeckleCoreGeometryDynamo" };
 
-          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ], excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
+
+          // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
+          // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
+          if ( res is Element )
           {
-            _id = ( string ) client._id,
-            loading = false,
-            isLoadingIndeterminate = true,
-            loadingBlurb = string.Format( "Done." )
-          } ) );
+            // creates a shadow copy of the baked object to store in our local state. 
+            var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
+            myObject._id = ToAddOrMod[ i ]._id;
+            myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
+            myObject.Type = ToAddOrMod[ i ].Type;
+            myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
+            myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
+            myObject.Properties[ "userModified" ] = false;
 
+            tempList.Add( myObject );
+          }
+
+          // TODO: Handle scenario when one object creates more objects. 
+          // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
+          if ( res is System.Collections.IEnumerable )
+          {
+            int k = 0;
+            var xx = ( ( IEnumerable<object> ) res ).Cast<Element>();
+            foreach ( var elm in xx )
+            {
+              var myObject = new SpeckleObject();
+              myObject._id = ToAddOrMod[ i ]._id;
+              myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
+              myObject.Type = ToAddOrMod[ i ].Type;
+              myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
+              myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
+              myObject.Properties[ "userModified" ] = false;
+              myObject.Properties[ "orderIndex" ] = k++; // keeps track of which elm it actually is
+
+              tempList.Add( myObject );
+            }
+          }
+        }
+
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = ( string ) client._id,
+          loading = true,
+          isLoadingIndeterminate = true,
+          loadingBlurb = string.Format( "Updating shadow state." )
+        } ) );
+
+        // set the local state stream's object list, and inject it in the kits, persist it in the doc
+        previousStream.Objects = tempList;
+        InjectStateInKits();
+        using ( var t = new Transaction( CurrentDoc.Document, "Speckle State Save" ) )
+        {
+          t.Start();
+          Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
           t.Commit();
         }
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = ( string ) client._id,
+          loading = false,
+          isLoadingIndeterminate = true,
+          loadingBlurb = string.Format( "Done." )
+        } ) );
       } ) );
 
       Executor.Raise();
