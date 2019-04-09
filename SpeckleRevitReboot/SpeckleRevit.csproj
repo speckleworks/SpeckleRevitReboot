@@ -86,6 +86,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ErrorEater.cs" />
     <Compile Include="Storage\HelperClasses.cs" />
     <Compile Include="Storage\SpeckleClientsStorage.cs" />
     <Compile Include="Entry.cs" />

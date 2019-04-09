@@ -99,13 +99,18 @@ namespace SpeckleRevit.UI
             _id = ( string ) client._id,
             loading = true,
             isLoadingIndeterminate = false,
-            loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
+            loadingProgress = 1f * i/ToAddOrMod.Count * 100,
+            loadingBlurb = string.Format( "Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count )
           } ) );
 
           object res;
           using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake " + mySpkObj._id ) )
           {
             t.Start();
+
+            var failOpts = t.GetFailureHandlingOptions();
+            failOpts.SetFailuresPreprocessor( new ErrorEater() );
+            t.SetFailureHandlingOptions( failOpts );
 
             res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
 
