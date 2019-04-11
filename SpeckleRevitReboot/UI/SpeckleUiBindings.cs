@@ -211,7 +211,8 @@ namespace SpeckleRevit.UI
       if ( foundKnownTransaction != null ) return;
       //if ( transactionNames.Contains( "Speckle Bake" ) || transactionNames.Contains( "Speckle Delete" ) ) return;
 
-      // TODO: Mark as modified the above elements in LocalState IF the transaction name is not speckle bake or speckle delete
+      // TODO: Notify ui that application state now differs from stream state.
+      // Will require a iterating by stream rather than grouped "allStateObjects"
       var modified = e.GetModifiedElementIds();
       var allStateObjects = ( from p in LocalState.SelectMany( s => s.Objects ) select p ).ToList();
       var changed = false;
@@ -246,7 +247,21 @@ namespace SpeckleRevit.UI
     #region client add/remove + serialisation/deserialisation
     public override void AddSender( string args )
     {
-      //TODO: Add sender
+      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      ClientListWrapper.clients.Add( client );
+
+      // TODO: Add stream to LocalState (do we actually need to??? hm...).
+
+      Queue.Add( new Action( ( ) =>
+      {
+        using ( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
+        {
+          t.Start();
+          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
     }
 
     /// <summary>
@@ -353,5 +368,59 @@ namespace SpeckleRevit.UI
       return CurrentDoc.Document.PathName;
     }
     #endregion
+
+    #region sender 
+
+    public string GetObjectSelection( )
+    {
+      var selectionIds = CurrentDoc.Selection.GetElementIds();
+      List<dynamic> selectedObjects = new List<dynamic>();
+
+      foreach ( var id in selectionIds )
+      {
+        var elm = CurrentDoc.Document.GetElement( id );
+        var cat = elm.Category;
+        var typ = elm.GetType();
+        var isFam = elm is FamilyInstance;
+
+        if ( isFam ) { 
+          var fam = ( elm as FamilyInstance ).Symbol.FamilyName;
+        }
+
+        selectedObjects.Add( new
+        {
+          id = elm.UniqueId.ToString(),//id.ToString(),
+          type = typ.Name,
+          cat = cat.Name
+        } );
+      }
+
+      return JsonConvert.SerializeObject( selectedObjects );
+    }
+
+    public List<ObjectSelectionFilter> GetFilters( )
+    {
+      // TODO
+      var selectionIds = CurrentDoc.Selection.GetElementIds();
+
+      var selectedObjectsFilter = new ObjectSelectionFilter() { FilterName = "Selected objects", ObjectCount = selectionIds.Count };
+
+      foreach ( Category cat in CurrentDoc.Document.Settings.Categories )
+      {
+
+      }
+
+      return new List<ObjectSelectionFilter>() { selectedObjectsFilter };
+    }
+
+
+    #endregion
+  }
+
+  public class ObjectSelectionFilter
+  {
+    public string FilterName = "Default Filter Name";
+    public int ObjectCount = 0;
+    public bool Toggled = false;
   }
 }

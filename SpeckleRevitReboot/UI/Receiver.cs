@@ -122,7 +122,7 @@ namespace SpeckleRevit.UI
               var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
               myObject._id = mySpkObj._id;
               myObject.ApplicationId = mySpkObj.ApplicationId;
-              myObject.Type = mySpkObj.Type;
+              myObject.Properties[ "__type" ] = mySpkObj.Type;
               myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
               myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
               myObject.Properties[ "userModified" ] = false;
@@ -141,7 +141,7 @@ namespace SpeckleRevit.UI
                 var myObject = new SpeckleObject();
                 myObject._id = mySpkObj._id;
                 myObject.ApplicationId = mySpkObj.ApplicationId;
-                myObject.Type = mySpkObj.Type;
+                myObject.Properties[ "__type" ] = mySpkObj.Type;
                 myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
                 myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
                 myObject.Properties[ "userModified" ] = false;
