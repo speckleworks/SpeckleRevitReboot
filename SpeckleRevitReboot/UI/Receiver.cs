@@ -25,7 +25,7 @@ namespace SpeckleRevit.UI
 
       NotifyUi( "update-client", JsonConvert.SerializeObject( new
       {
-        _id = (string) client._id,
+        _id = ( string ) client._id,
         loading = true,
         loadingBlurb = "Getting stream from server..."
       } ) );
@@ -87,26 +87,32 @@ namespace SpeckleRevit.UI
       }
 
       // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
-      Queue.Add( new Action( ( ) =>
+
+      var tempList = new List<SpeckleObject>();
+      int i = 0;
+      foreach ( var mySpkObj in ToAddOrMod )
       {
-        using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake (" + ( string ) client.streamId + ")" ) )
+        Queue.Add( new Action( ( ) =>
         {
-          t.Start();
-
-          var tempList = new List<SpeckleObject>();
-          for ( int i = 0; i < ToAddOrMod.Count; i++ )
+          NotifyUi( "update-client", JsonConvert.SerializeObject( new
           {
-            NotifyUi( "update-client", JsonConvert.SerializeObject( new
-            {
-              _id = ( string ) client._id,
-              loading = true,
-              isLoadingIndeterminate = false,
-              loadingBlurb = string.Format( "Creating/editing objects: {0} / {1}", i, ToAddOrMod.Count )
-            } ) );
+            _id = ( string ) client._id,
+            loading = true,
+            isLoadingIndeterminate = false,
+            loadingProgress = 1f * i/ToAddOrMod.Count * 100,
+            loadingBlurb = string.Format( "Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count )
+          } ) );
 
-            var exc = new List<string>() { "SpeckleCoreGeometryDynamo" };
+          object res;
+          using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake " + mySpkObj._id ) )
+          {
+            t.Start();
 
-            var res = SpeckleCore.Converter.Deserialise( ToAddOrMod[ i ], excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
+            var failOpts = t.GetFailureHandlingOptions();
+            failOpts.SetFailuresPreprocessor( new ErrorEater() );
+            t.SetFailureHandlingOptions( failOpts );
+
+            res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
 
             // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
             // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
@@ -114,9 +120,9 @@ namespace SpeckleRevit.UI
             {
               // creates a shadow copy of the baked object to store in our local state. 
               var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
-              myObject._id = ToAddOrMod[ i ]._id;
-              myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-              myObject.Type = ToAddOrMod[ i ].Type;
+              myObject._id = mySpkObj._id;
+              myObject.ApplicationId = mySpkObj.ApplicationId;
+              myObject.Properties[ "__type" ] = mySpkObj.Type;
               myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
               myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
               myObject.Properties[ "userModified" ] = false;
@@ -133,9 +139,9 @@ namespace SpeckleRevit.UI
               foreach ( var elm in xx )
               {
                 var myObject = new SpeckleObject();
-                myObject._id = ToAddOrMod[ i ]._id;
-                myObject.ApplicationId = ToAddOrMod[ i ].ApplicationId;
-                myObject.Type = ToAddOrMod[ i ].Type;
+                myObject._id = mySpkObj._id;
+                myObject.ApplicationId = mySpkObj.ApplicationId;
+                myObject.Properties[ "__type" ] = mySpkObj.Type;
                 myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
                 myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
                 myObject.Properties[ "userModified" ] = false;
@@ -144,31 +150,42 @@ namespace SpeckleRevit.UI
                 tempList.Add( myObject );
               }
             }
+
+            t.Commit();
           }
 
-          NotifyUi( "update-client", JsonConvert.SerializeObject( new
-          {
-            _id = ( string ) client._id,
-            loading = true,
-            isLoadingIndeterminate = true,
-            loadingBlurb = string.Format( "Updating shadow state." )
-          } ) );
+          i++;
+        } ) );
+        Executor.Raise();
+      }
 
-          // set the local state stream's object list, and inject it in the kits, persist it in the doc
-          previousStream.Objects = tempList;
-          InjectStateInKits();
+      Queue.Add( new Action( ( ) =>
+      {
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = ( string ) client._id,
+          loading = true,
+          isLoadingIndeterminate = true,
+          loadingBlurb = string.Format( "Updating shadow state." )
+        } ) );
+
+        // set the local state stream's object list, and inject it in the kits, persist it in the doc
+        previousStream.Objects = tempList;
+        InjectStateInKits();
+        using ( var t = new Transaction( CurrentDoc.Document, "Speckle State Save" ) )
+        {
+          t.Start();
           Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
-
-          NotifyUi( "update-client", JsonConvert.SerializeObject( new
-          {
-            _id = ( string ) client._id,
-            loading = false,
-            isLoadingIndeterminate = true,
-            loadingBlurb = string.Format( "Done." )
-          } ) );
-
           t.Commit();
         }
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = ( string ) client._id,
+          loading = false,
+          isLoadingIndeterminate = true,
+          loadingBlurb = string.Format( "Done." )
+        } ) );
+
       } ) );
 
       Executor.Raise();
