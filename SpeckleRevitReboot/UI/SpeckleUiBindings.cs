@@ -251,12 +251,24 @@ namespace SpeckleRevit.UI
       ClientListWrapper.clients.Add( client );
 
       // TODO: Add stream to LocalState (do we actually need to??? hm...).
+      var myStream = new SpeckleStream() { StreamId = client.streamId as string, Objects = new List<SpeckleObject>() };
+
+      foreach(dynamic obj in client.objects )
+      {
+        var SpkObj = new SpeckleObject() { };
+        SpkObj.Properties[ "revitUniqueId" ] = obj.id as string;
+        SpkObj.Properties[ "__type" ] = "Sent Object";
+        myStream.Objects.Add( SpkObj );
+      }
+
+      LocalState.Add( myStream );
 
       Queue.Add( new Action( ( ) =>
       {
         using ( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
         {
           t.Start();
+          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
           SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
           t.Commit();
         }
@@ -389,7 +401,7 @@ namespace SpeckleRevit.UI
 
         selectedObjects.Add( new
         {
-          id = elm.UniqueId.ToString(),//id.ToString(),
+          id = elm.UniqueId.ToString(),
           type = typ.Name,
           cat = cat.Name
         } );

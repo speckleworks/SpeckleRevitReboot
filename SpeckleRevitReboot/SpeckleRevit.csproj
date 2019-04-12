@@ -92,7 +92,8 @@
     <Compile Include="Entry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\SpeckleStateStorage.cs" />
-    <Compile Include="UI\BakeReceiver.cs" />
+    <Compile Include="UI\Receiver.cs" />
+    <Compile Include="UI\Sender.cs" />
     <Compile Include="UI\SpeckleUiBindings.cs" />
   </ItemGroup>
   <ItemGroup>
