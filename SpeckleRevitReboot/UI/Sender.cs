@@ -40,6 +40,8 @@ namespace SpeckleRevit.UI
 
         var revitElement = CurrentDoc.Document.GetElement( ( string ) obj.id );
         var conversionResult = SpeckleCore.Converter.Serialise( revitElement );
+        // TODO: Handle potential multiple results.
+        // ie, a floor being split in two by a big fat shaft.
         convertedObjects.Add( conversionResult );
       }
 
