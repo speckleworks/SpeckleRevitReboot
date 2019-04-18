@@ -11,6 +11,8 @@ namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit
   {
+    // TODO: Orchestration
+    // Create buckets, send sequentially, notify ui re upload progress
     public override void UpdateSender( string args )
     {
       var client = JsonConvert.DeserializeObject<dynamic>( args );
