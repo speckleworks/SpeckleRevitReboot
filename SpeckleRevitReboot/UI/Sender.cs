@@ -42,18 +42,50 @@ namespace SpeckleRevit.UI
 
         var revitElement = CurrentDoc.Document.GetElement( ( string ) obj.id );
         var conversionResult = SpeckleCore.Converter.Serialise( revitElement );
-        // TODO: Handle potential multiple results.
-        // ie, a floor being split in two by a big fat shaft.
         convertedObjects.Add( conversionResult );
       }
 
-      var persistedObjects = apiClient.ObjectCreateAsync( convertedObjects ).Result.Resources;
-      var myStream = new SpeckleStream() { Objects = new List<SpeckleObject>() };
+      LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
 
-      myStream.Objects.AddRange( persistedObjects.Select( obj => new SpecklePlaceholder() { _id = obj._id } ) );
+      var chunks = convertedObjects.ChunkBy( 84 );
+      var placeholders = new List<SpeckleObject>();
 
+      i = 0;
+      foreach ( var chunk in chunks )
+      {
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = ( string ) client._id,
+          loading = true,
+          isLoadingIndeterminate = false,
+          loadingProgress = 1f * i++ / chunks.Count * 100,
+          loadingBlurb = string.Format( "Uploading {0} / {1}", i, client.objects.Count )
+        } ) );
+
+        var chunkResponse = apiClient.ObjectCreateAsync( chunk ).Result.Resources;
+
+        int m = 0;
+        foreach ( var obj in chunk )
+        {
+          obj._id = chunkResponse[ m++ ]._id;
+          placeholders.Add( new SpecklePlaceholder() { _id = obj._id } );
+        }
+
+        Task.Run( ( ) =>
+        {
+          foreach ( var obj in chunk )
+          {
+            if ( obj.Type != "Placeholder" ) LocalContext.AddSentObject( obj, apiClient.BaseUrl );
+          }
+        } );
+      }
+
+      var myStream = new SpeckleStream() { Objects = placeholders };
+
+      var ug = UnitUtils.GetUnitGroup( UnitType.UT_Length );
       var baseProps = new Dictionary<string, object>();
       baseProps[ "units" ] = CurrentDoc.Document.GetUnits().ToString();
+      baseProps[ "units_secondtry" ] = ug.ToString();
 
       myStream.BaseProperties = baseProps;
 
@@ -65,12 +97,12 @@ namespace SpeckleRevit.UI
         loading = false,
         loadingBlurb = "Done doing stuff..."
       } ) );
+
       // TODO: Everything
       //client.objects.id holds all the objects' uniqueids re revit elements
       //so then basically we, in theory, should just do:
       // SpeckleCore.Converter.Serialise( element ) and shit goes forward from there. 
       // ie, we get back our converted objects, and start sending them to the server, etc. etc. 
-
     }
   }
 }
