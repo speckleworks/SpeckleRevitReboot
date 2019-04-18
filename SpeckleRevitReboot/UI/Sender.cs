@@ -84,10 +84,20 @@ namespace SpeckleRevit.UI
 
       var ug = UnitUtils.GetUnitGroup( UnitType.UT_Length );
       var baseProps = new Dictionary<string, object>();
+      
+      // TODO: format units to something rational
       baseProps[ "units" ] = CurrentDoc.Document.GetUnits().ToString();
       baseProps[ "units_secondtry" ] = ug.ToString();
 
       myStream.BaseProperties = baseProps;
+
+      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      {
+        _id = ( string ) client._id,
+        loading = true,
+        isLoadingIndeterminate = true,
+        loadingBlurb = "Updating stream."
+      } ) );
 
       var response = apiClient.StreamUpdateAsync( ( string ) client.streamId, myStream ).Result;
 
@@ -95,14 +105,8 @@ namespace SpeckleRevit.UI
       {
         _id = ( string ) client._id,
         loading = false,
-        loadingBlurb = "Done doing stuff..."
+        loadingBlurb = "Done sending."
       } ) );
-
-      // TODO: Everything
-      //client.objects.id holds all the objects' uniqueids re revit elements
-      //so then basically we, in theory, should just do:
-      // SpeckleCore.Converter.Serialise( element ) and shit goes forward from there. 
-      // ie, we get back our converted objects, and start sending them to the server, etc. etc. 
     }
   }
 }
