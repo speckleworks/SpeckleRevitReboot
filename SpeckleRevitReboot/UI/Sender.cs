@@ -23,6 +23,8 @@ namespace SpeckleRevit.UI
 
       var chunkSize = 5;
       int i = 0;
+
+      var currentBucketSize = 0;
       foreach( var obj in client.objects )
       {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
