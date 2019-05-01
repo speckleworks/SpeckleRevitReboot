@@ -16,52 +16,69 @@ namespace SpeckleRevit.UI
     public override void UpdateSender( string args )
     {
       var client = JsonConvert.DeserializeObject<dynamic>( args );
-      var apiClient = new SpeckleApiClient( ( string ) client.account.RestApi ) { AuthToken = ( string ) client.account.Token };
-
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
-      {
-        _id = ( string ) client._id,
-        loading = true,
-        loadingBlurb = "Starting to do stuff..."
-      } ) );
+      var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
       var convertedObjects = new List<SpeckleObject>();
+      var placeholders = new List<SpeckleObject>();
 
+      var chunkSize = 5;
       int i = 0;
-      foreach ( var obj in client.objects )
+      foreach( var obj in client.objects )
       {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
         {
-          _id = ( string ) client._id,
+          _id = (string) client._id,
           loading = true,
           isLoadingIndeterminate = false,
           loadingProgress = 1f * i++ / client.objects.Count * 100,
-          loadingBlurb = string.Format( "Converting objects: {0} / {1}", i, client.objects.Count )
+          loadingBlurb = string.Format( "Converting and uploading objects: {0} / {1}", i, client.objects.Count )
         } ) );
 
         try
         {
-          var revitElement = CurrentDoc.Document.GetElement( ( string ) obj.id );
+          var revitElement = CurrentDoc.Document.GetElement( (string) obj.id );
           var conversionResult = SpeckleCore.Converter.Serialise( revitElement );
           convertedObjects.Add( conversionResult );
+
+          if( convertedObjects.Count >= chunkSize )
+          {
+            LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
+            try
+            {
+              var chunkResponse = apiClient.ObjectCreateAsync( convertedObjects ).Result.Resources;
+              int m = 0;
+              foreach( var objConverted in convertedObjects )
+              {
+                objConverted._id = chunkResponse[ m++ ]._id;
+                placeholders.Add( new SpecklePlaceholder() { _id = objConverted._id } );
+                if( objConverted.Type != "Placeholder" ) LocalContext.AddSentObject( objConverted, apiClient.BaseUrl );
+              }
+            }
+            catch( Exception e )
+            {
+              // TODO: Handle object creation error.
+            }
+            convertedObjects = new List<SpeckleObject>(); // reset the chunkness
+          }
         }
-        catch ( Exception e )
+        catch( Exception e )
         {
-          // TODO: Bubble it up
+          // TODO: Handle conversion error
         }
       }
 
-      LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
+      convertedObjects = new List<SpeckleObject>();
+      //LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
 
       var chunks = convertedObjects.ChunkBy( 5 );
-      var placeholders = new List<SpeckleObject>();
+      //var placeholders = new List<SpeckleObject>();
 
       i = 0;
-      foreach ( var chunk in chunks )
+      foreach( var chunk in chunks )
       {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
         {
-          _id = ( string ) client._id,
+          _id = (string) client._id,
           loading = true,
           isLoadingIndeterminate = false,
           loadingProgress = 1f * i++ / chunks.Count * 100,
@@ -73,21 +90,21 @@ namespace SpeckleRevit.UI
           var chunkResponse = apiClient.ObjectCreateAsync( chunk ).Result.Resources;
 
           int m = 0;
-          foreach ( var obj in chunk )
+          foreach( var obj in chunk )
           {
             obj._id = chunkResponse[ m++ ]._id;
             placeholders.Add( new SpecklePlaceholder() { _id = obj._id } );
           }
 
-          Task.Run( ( ) =>
+          Task.Run( () =>
           {
-            foreach ( var obj in chunk )
+            foreach( var obj in chunk )
             {
-              if ( obj.Type != "Placeholder" ) LocalContext.AddSentObject( obj, apiClient.BaseUrl );
+              if( obj.Type != "Placeholder" ) LocalContext.AddSentObject( obj, apiClient.BaseUrl );
             }
           } );
         }
-        catch ( Exception e )
+        catch( Exception e )
         {
           //TODO: Bubble it up...
         }
@@ -106,17 +123,17 @@ namespace SpeckleRevit.UI
 
       NotifyUi( "update-client", JsonConvert.SerializeObject( new
       {
-        _id = ( string ) client._id,
+        _id = (string) client._id,
         loading = true,
         isLoadingIndeterminate = true,
         loadingBlurb = "Updating stream."
       } ) );
 
-      var response = apiClient.StreamUpdateAsync( ( string ) client.streamId, myStream ).Result;
+      var response = apiClient.StreamUpdateAsync( (string) client.streamId, myStream ).Result;
 
       NotifyUi( "update-client", JsonConvert.SerializeObject( new
       {
-        _id = ( string ) client._id,
+        _id = (string) client._id,
         loading = false,
         loadingBlurb = "Done sending."
       } ) );
