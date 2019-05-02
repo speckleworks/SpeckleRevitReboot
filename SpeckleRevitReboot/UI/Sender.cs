@@ -21,10 +21,9 @@ namespace SpeckleRevit.UI
       var convertedObjects = new List<SpeckleObject>();
       var placeholders = new List<SpeckleObject>();
 
-      var chunkSize = 5;
       int i = 0;
-
       long currentBucketSize = 0;
+
       foreach( var obj in client.objects )
       {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
@@ -44,7 +43,7 @@ namespace SpeckleRevit.UI
           var byteCount = Converter.getBytes( conversionResult ).Length;
           currentBucketSize += byteCount;
 
-          if(currentBucketSize > 2e6 )
+          if( byteCount > 2e6 )
           {
             // TODO: Handle fat objects
             var problemId = revitElement.Id;
@@ -78,49 +77,6 @@ namespace SpeckleRevit.UI
         catch( Exception e )
         {
           // TODO: Handle conversion error
-        }
-      }
-
-      convertedObjects = new List<SpeckleObject>();
-      //LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
-
-      var chunks = convertedObjects.ChunkBy( 5 );
-      //var placeholders = new List<SpeckleObject>();
-
-      i = 0;
-      foreach( var chunk in chunks )
-      {
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
-        {
-          _id = (string) client._id,
-          loading = true,
-          isLoadingIndeterminate = false,
-          loadingProgress = 1f * i++ / chunks.Count * 100,
-          loadingBlurb = string.Format( "Uploading {0} / {1}", i, client.objects.Count )
-        } ) );
-
-        try
-        {
-          var chunkResponse = apiClient.ObjectCreateAsync( chunk ).Result.Resources;
-
-          int m = 0;
-          foreach( var obj in chunk )
-          {
-            obj._id = chunkResponse[ m++ ]._id;
-            placeholders.Add( new SpecklePlaceholder() { _id = obj._id } );
-          }
-
-          Task.Run( () =>
-          {
-            foreach( var obj in chunk )
-            {
-              if( obj.Type != "Placeholder" ) LocalContext.AddSentObject( obj, apiClient.BaseUrl );
-            }
-          } );
-        }
-        catch( Exception e )
-        {
-          //TODO: Bubble it up...
         }
       }
 
