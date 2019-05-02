@@ -24,7 +24,7 @@ namespace SpeckleRevit.UI
       var chunkSize = 5;
       int i = 0;
 
-      var currentBucketSize = 0;
+      long currentBucketSize = 0;
       foreach( var obj in client.objects )
       {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
@@ -39,12 +39,23 @@ namespace SpeckleRevit.UI
         try
         {
           var revitElement = CurrentDoc.Document.GetElement( (string) obj.id );
+
           var conversionResult = SpeckleCore.Converter.Serialise( revitElement );
+          var byteCount = Converter.getBytes( conversionResult ).Length;
+          currentBucketSize += byteCount;
+
+          if(currentBucketSize > 2e6 )
+          {
+            // TODO: Handle fat objects
+            var problemId = revitElement.Id;
+          }
+
           convertedObjects.Add( conversionResult );
 
-          if( convertedObjects.Count >= chunkSize )
+          if( currentBucketSize > 5e5 ) // aim for roughly 500kb uncompressed
           {
             LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
+
             try
             {
               var chunkResponse = apiClient.ObjectCreateAsync( convertedObjects ).Result.Resources;
@@ -60,6 +71,7 @@ namespace SpeckleRevit.UI
             {
               // TODO: Handle object creation error.
             }
+            currentBucketSize = 0;
             convertedObjects = new List<SpeckleObject>(); // reset the chunkness
           }
         }
