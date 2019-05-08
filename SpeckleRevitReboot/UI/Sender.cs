@@ -13,6 +13,8 @@ namespace SpeckleRevit.UI
   {
     // TODO: Orchestration
     // Create buckets, send sequentially, notify ui re upload progress
+    // NOTE: Problems with local context and cache: we seem to not sucesffuly pass through it
+    // perhaps we're not storing the right sent object (localcontext.addsentobject)
     public override void UpdateSender( string args )
     {
       var client = JsonConvert.DeserializeObject<dynamic>( args );
