@@ -51,7 +51,7 @@ namespace SpeckleRevit.UI
 
           convertedObjects.Add( conversionResult );
 
-          if( currentBucketSize > 5e5 ) // aim for roughly 500kb uncompressed
+          if( currentBucketSize > 5e5 || i >= client.objects.Count) // aim for roughly 500kb uncompressed
           {
             LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
 
