@@ -3,4 +3,4 @@
 	url = https://github.com/speckleworks/SpeckleCore.git
 [submodule "SpeckleUi"]
 	path = SpeckleUi
-	url = https://github.com/didimitrie/SpeckleUi.git
+url=https://github.com/speckleworks/SpeckleUi.git
