@@ -76,6 +76,7 @@ namespace SpeckleRevit.UI
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
       RevitApp.Application.DocumentOpened += Application_DocumentOpened;
       RevitApp.Application.DocumentClosed += Application_DocumentClosed;
+      //CurrentDoc.Document.
       RevitApp.Idling += ApplicationIdling;
 
 

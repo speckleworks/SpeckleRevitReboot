@@ -14,19 +14,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleCore", "SpeckleCore\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleUiBase", "SpeckleUi\SpeckleUiBase\SpeckleUiBase.csproj", "{CE40C576-3B05-443A-A1BA-CB3A796D0084}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleElementsRevit", "..\SpeckleElements\SpeckleElementsRevit\SpeckleElementsRevit.csproj", "{C08796BB-C109-4961-AB72-A2A74C06E510}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitElements", "RevitElements", "{B29A4916-B644-40D8-9911-0F3DACA32176}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleElements", "..\SpeckleElements\SpeckleElementsBuilder\SpeckleElements.csproj", "{F7980709-1E82-44B6-B3F8-0450A1FE6DC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleElements", "SpeckleElements\SpeckleElementsBuilder\SpeckleElements.csproj", "{F7980709-1E82-44B6-B3F8-0450A1FE6DC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleElementsClasses", "..\SpeckleElements\SpeckleElements\SpeckleElementsClasses.csproj", "{42E1DB9C-E4D5-4190-9977-874E8143DCC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleElementsClasses", "SpeckleElements\SpeckleElements\SpeckleElementsClasses.csproj", "{42E1DB9C-E4D5-4190-9977-874E8143DCC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleCoreGeometryRevit", "..\..\Speckle\SpeckleCoreGeometry\SpeckleCoreGeometryRevit\SpeckleCoreGeometryRevit.csproj", "{9035B0DB-7746-4356-ABA8-9878C9E7B53C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleCoreGeometryClasses", "..\..\Speckle\SpeckleCoreGeometry\SpeckleCoreGeometryClasses\SpeckleCoreGeometryClasses.csproj", "{AD40CE88-276B-45BF-9736-7180730E7281}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleCoreGeometry", "..\..\Speckle\SpeckleCoreGeometry\SpeckleCoreGeometry\SpeckleCoreGeometry.csproj", "{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleElementsRevit", "SpeckleElements\SpeckleElementsRevit\SpeckleElementsRevit.csproj", "{C08796BB-C109-4961-AB72-A2A74C06E510}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,22 +82,6 @@ Global
 		{CE40C576-3B05-443A-A1BA-CB3A796D0084}.Release|Any CPU.Build.0 = Release|x64
 		{CE40C576-3B05-443A-A1BA-CB3A796D0084}.Release|x64.ActiveCfg = Release|x64
 		{CE40C576-3B05-443A-A1BA-CB3A796D0084}.Release|x64.Build.0 = Release|x64
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|Any CPU.ActiveCfg = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|Any CPU.Build.0 = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|x64.ActiveCfg = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|x64.Build.0 = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|Any CPU.ActiveCfg = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|Any CPU.Build.0 = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|x64.ActiveCfg = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|x64.Build.0 = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|x64.Build.0 = Debug|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|x64.ActiveCfg = Release|Any CPU
-		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|x64.Build.0 = Release|Any CPU
 		{F7980709-1E82-44B6-B3F8-0450A1FE6DC3}.Debug Dynamo|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7980709-1E82-44B6-B3F8-0450A1FE6DC3}.Debug Dynamo|Any CPU.Build.0 = Debug|Any CPU
 		{F7980709-1E82-44B6-B3F8-0450A1FE6DC3}.Debug Dynamo|x64.ActiveCfg = Debug|Any CPU
@@ -136,65 +114,30 @@ Global
 		{42E1DB9C-E4D5-4190-9977-874E8143DCC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42E1DB9C-E4D5-4190-9977-874E8143DCC5}.Release|x64.ActiveCfg = Release|Any CPU
 		{42E1DB9C-E4D5-4190-9977-874E8143DCC5}.Release|x64.Build.0 = Release|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Dynamo|Any CPU.ActiveCfg = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Dynamo|Any CPU.Build.0 = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Dynamo|x64.ActiveCfg = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Dynamo|x64.Build.0 = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Rhino|Any CPU.ActiveCfg = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Rhino|Any CPU.Build.0 = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Rhino|x64.ActiveCfg = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug Rhino|x64.Build.0 = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Debug|x64.Build.0 = Debug|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Release|x64.ActiveCfg = Release|Any CPU
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C}.Release|x64.Build.0 = Release|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Dynamo|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Dynamo|Any CPU.Build.0 = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Dynamo|x64.ActiveCfg = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Dynamo|x64.Build.0 = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Rhino|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Rhino|Any CPU.Build.0 = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Rhino|x64.ActiveCfg = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug Rhino|x64.Build.0 = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Debug|x64.Build.0 = Debug|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Release|x64.ActiveCfg = Release|Any CPU
-		{AD40CE88-276B-45BF-9736-7180730E7281}.Release|x64.Build.0 = Release|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Dynamo|Any CPU.ActiveCfg = Debug Dynamo|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Dynamo|Any CPU.Build.0 = Debug Dynamo|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Dynamo|x64.ActiveCfg = Debug Dynamo|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Dynamo|x64.Build.0 = Debug Dynamo|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Rhino|Any CPU.ActiveCfg = Debug Rhino|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Rhino|Any CPU.Build.0 = Debug Rhino|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Rhino|x64.ActiveCfg = Debug Rhino|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug Rhino|x64.Build.0 = Debug Rhino|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Debug|x64.Build.0 = Debug|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Release|x64.ActiveCfg = Release|Any CPU
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC}.Release|x64.Build.0 = Release|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|Any CPU.ActiveCfg = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|Any CPU.Build.0 = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|x64.ActiveCfg = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Dynamo|x64.Build.0 = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|Any CPU.ActiveCfg = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|Any CPU.Build.0 = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|x64.ActiveCfg = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug Rhino|x64.Build.0 = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Debug|x64.Build.0 = Debug|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|x64.ActiveCfg = Release|Any CPU
+		{C08796BB-C109-4961-AB72-A2A74C06E510}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C08796BB-C109-4961-AB72-A2A74C06E510} = {B29A4916-B644-40D8-9911-0F3DACA32176}
 		{F7980709-1E82-44B6-B3F8-0450A1FE6DC3} = {B29A4916-B644-40D8-9911-0F3DACA32176}
 		{42E1DB9C-E4D5-4190-9977-874E8143DCC5} = {B29A4916-B644-40D8-9911-0F3DACA32176}
-		{9035B0DB-7746-4356-ABA8-9878C9E7B53C} = {B29A4916-B644-40D8-9911-0F3DACA32176}
-		{AD40CE88-276B-45BF-9736-7180730E7281} = {B29A4916-B644-40D8-9911-0F3DACA32176}
-		{4E08BCAA-2B3A-4813-8B43-33B4AEDDF2FC} = {B29A4916-B644-40D8-9911-0F3DACA32176}
+		{C08796BB-C109-4961-AB72-A2A74C06E510} = {B29A4916-B644-40D8-9911-0F3DACA32176}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82090FED-8443-42DC-8044-0F5C611A25F8}
