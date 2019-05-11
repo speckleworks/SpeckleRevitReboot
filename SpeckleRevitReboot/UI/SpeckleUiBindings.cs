@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -29,6 +30,8 @@ namespace SpeckleRevit.UI
 
     public ExternalEvent Executor;
 
+    public Timer SelectionTimer;
+
     /// <summary>
     /// Holds the current project's clients
     /// </summary>
@@ -53,9 +56,9 @@ namespace SpeckleRevit.UI
 
       // LOCAL STATE
       LocalState = new List<SpeckleStream>();
-      Queue.Add( new Action( ( ) =>
+      Queue.Add( new Action( () =>
       {
-        using ( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
         {
           t.Start();
           LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
@@ -73,9 +76,30 @@ namespace SpeckleRevit.UI
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
       RevitApp.Application.DocumentOpened += Application_DocumentOpened;
       RevitApp.Application.DocumentClosed += Application_DocumentClosed;
+      RevitApp.Idling += ApplicationIdling;
 
+
+      SelectionTimer = new Timer( 1400 ) { AutoReset = true, Enabled = true };
+      SelectionTimer.Elapsed += SelectionTimer_Elapsed;
       // TODO: Find a way to handle when document is closed via middle mouse click
       // thus triggering the focus on a new project
+
+    }
+
+    private void SelectionTimer_Elapsed( object sender, ElapsedEventArgs e )
+    {
+      if( CurrentDoc == null ) return;
+      var selectedObjectsCount = CurrentDoc != null ? CurrentDoc.Selection.GetElementIds().Count : 0;
+
+      NotifyUi( "update-selection-count", JsonConvert.SerializeObject( new
+      {
+        selectedObjectsCount
+      } ) );
+    }
+
+    private void ApplicationIdling( object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e )
+    {
+      Debug.WriteLine( "App is idling yo!" );
     }
 
     #region Kit injection utils
@@ -83,17 +107,17 @@ namespace SpeckleRevit.UI
     /// <summary>
     /// Injects the Revit app in any speckle kit Initialiser class that has a 'RevitApp' property defined. This is need for creating revit elements from that assembly without having hard references on the ui library.
     /// </summary>
-    public void InjectRevitAppInKits( )
+    public void InjectRevitAppInKits()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach ( var ass in assemblies )
+      foreach( var ass in assemblies )
       {
         var types = ass.GetTypes();
-        foreach ( var type in types )
+        foreach( var type in types )
         {
-          if ( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
           {
-            if ( type.GetProperties().Select( p => p.Name ).Contains( "RevitApp" ) )
+            if( type.GetProperties().Select( p => p.Name ).Contains( "RevitApp" ) )
             {
               type.GetProperty( "RevitApp" ).SetValue( null, RevitApp );
             }
@@ -106,17 +130,17 @@ namespace SpeckleRevit.UI
     /// Injects the current lolcal state in any speckle kit initialiser class that has a "LocalRevitState" property defined. 
     /// This can then be used to determine what existing speckle baked objects exist in the current doc and either modify/delete whatever them in the conversion methods.
     /// </summary>
-    public void InjectStateInKits( )
+    public void InjectStateInKits()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach ( var ass in assemblies )
+      foreach( var ass in assemblies )
       {
         var types = ass.GetTypes();
-        foreach ( var type in types )
+        foreach( var type in types )
         {
-          if ( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
           {
-            if ( type.GetProperties().Select( p => p.Name ).Contains( "LocalRevitState" ) )
+            if( type.GetProperties().Select( p => p.Name ).Contains( "LocalRevitState" ) )
             {
               type.GetProperty( "LocalRevitState" ).SetValue( null, LocalState );
             }
@@ -131,14 +155,14 @@ namespace SpeckleRevit.UI
     public void InjectScaleInKits( double scale )
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach ( var ass in assemblies )
+      foreach( var ass in assemblies )
       {
         var types = ass.GetTypes();
-        foreach ( var type in types )
+        foreach( var type in types )
         {
-          if ( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
           {
-            if ( type.GetProperties().Select( p => p.Name ).Contains( "RevitScale" ) )
+            if( type.GetProperties().Select( p => p.Name ).Contains( "RevitScale" ) )
             {
               type.GetProperty( "RevitScale" ).SetValue( null, scale );
             }
@@ -158,15 +182,15 @@ namespace SpeckleRevit.UI
     #region app events
     private void RevitApp_ViewActivated( object sender, Autodesk.Revit.UI.Events.ViewActivatedEventArgs e )
     {
-      if ( GetDocHash( e.Document ) != GetDocHash( e.PreviousActiveView.Document ) )
+      if( GetDocHash( e.Document ) != GetDocHash( e.PreviousActiveView.Document ) )
       {
         DispatchStoreActionUi( "flushClients" );
         DispatchStoreActionUi( "getExistingClients" );
 
         // TODO: Switch current local state to document
-        Queue.Add( new Action( ( ) =>
+        Queue.Add( new Action( () =>
         {
-          using ( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
+          using( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
           {
             t.Start();
             LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
@@ -189,9 +213,9 @@ namespace SpeckleRevit.UI
       DispatchStoreActionUi( "getExistingClients" );
 
       // TODO: Get current local state from document
-      Queue.Add( new Action( ( ) =>
+      Queue.Add( new Action( () =>
       {
-        using ( Transaction t = new Transaction( CurrentDoc.Document, "Reading Local Speckle State" ) )
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Reading Local Speckle State" ) )
         {
           t.Start();
           LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
@@ -208,30 +232,30 @@ namespace SpeckleRevit.UI
     {
       var transactionNames = e.GetTransactionNames();
       var foundKnownTransaction = transactionNames.FirstOrDefault( str => str.Contains( "Speckle" ) );
-      if ( foundKnownTransaction != null ) return;
+      if( foundKnownTransaction != null ) return;
       //if ( transactionNames.Contains( "Speckle Bake" ) || transactionNames.Contains( "Speckle Delete" ) ) return;
 
       // TODO: Notify ui that application state now differs from stream state.
       // Will require a iterating by stream rather than grouped "allStateObjects"
       var modified = e.GetModifiedElementIds();
-      var allStateObjects = ( from p in LocalState.SelectMany( s => s.Objects ) select p ).ToList();
+      var allStateObjects = (from p in LocalState.SelectMany( s => s.Objects ) select p).ToList();
       var changed = false;
-      foreach ( var id in modified )
+      foreach( var id in modified )
       {
         var elUniqueId = CurrentDoc.Document.GetElement( id ).UniqueId;
-        var found = allStateObjects.FirstOrDefault( o => ( string ) o.Properties[ "revitUniqueId" ] == elUniqueId );
-        if ( found != null )
+        var found = allStateObjects.FirstOrDefault( o => (string) o.Properties[ "revitUniqueId" ] == elUniqueId );
+        if( found != null )
         {
           found.Properties[ "userModified" ] = true;
           changed = true;
         }
       }
 
-      if ( changed )
+      if( changed )
       {
-        Queue.Add( new Action( ( ) =>
+        Queue.Add( new Action( () =>
         {
-          using ( Transaction t = new Transaction( CurrentDoc.Document, "Writing Local Speckle State" ) )
+          using( Transaction t = new Transaction( CurrentDoc.Document, "Writing Local Speckle State" ) )
           {
             t.Start();
             SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
@@ -253,7 +277,7 @@ namespace SpeckleRevit.UI
       // TODO: Add stream to LocalState (do we actually need to??? hm...).
       var myStream = new SpeckleStream() { StreamId = client.streamId as string, Objects = new List<SpeckleObject>() };
 
-      foreach(dynamic obj in client.objects )
+      foreach( dynamic obj in client.objects )
       {
         var SpkObj = new SpeckleObject() { };
         SpkObj.Properties[ "revitUniqueId" ] = obj.id as string;
@@ -263,9 +287,9 @@ namespace SpeckleRevit.UI
 
       LocalState.Add( myStream );
 
-      Queue.Add( new Action( ( ) =>
+      Queue.Add( new Action( () =>
       {
-        using ( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
         {
           t.Start();
           SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
@@ -285,9 +309,9 @@ namespace SpeckleRevit.UI
       var client = JsonConvert.DeserializeObject<dynamic>( args );
       ClientListWrapper.clients.Add( client );
 
-      Queue.Add( new Action( ( ) =>
+      Queue.Add( new Action( () =>
       {
-        using ( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
         {
           t.Start();
           SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
@@ -306,12 +330,12 @@ namespace SpeckleRevit.UI
       var client = JsonConvert.DeserializeObject<dynamic>( args );
       var index = ClientListWrapper.clients.FindIndex( cl => cl.clientId == client.clientId );
 
-      if ( index == -1 ) return;
+      if( index == -1 ) return;
 
       ClientListWrapper.clients.RemoveAt( index );
-      Queue.Add( new Action( ( ) =>
+      Queue.Add( new Action( () =>
       {
-        using ( Transaction t = new Transaction( CurrentDoc.Document, "Removing Speckle Client" ) )
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Removing Speckle Client" ) )
         {
           t.Start();
           SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
@@ -325,10 +349,10 @@ namespace SpeckleRevit.UI
     /// Gets the clients stored in this file, if any.
     /// </summary>
     /// <returns></returns>
-    public override string GetFileClients( )
+    public override string GetFileClients()
     {
       var myReadClients = SpeckleClientsStorageManager.ReadClients( CurrentDoc.Document );
-      if ( myReadClients == null )
+      if( myReadClients == null )
         myReadClients = new SpeckleClientsWrapper();
 
       // Set them up in the class so we're aware of them
@@ -353,17 +377,17 @@ namespace SpeckleRevit.UI
     #endregion
 
     #region document info
-    public override string GetApplicationHostName( )
+    public override string GetApplicationHostName()
     {
       return "Revit";
     }
 
-    public override string GetFileName( )
+    public override string GetFileName()
     {
       return CurrentDoc.Document.Title;
     }
 
-    public override string GetDocumentId( )
+    public override string GetDocumentId()
     {
       return GetDocHash( CurrentDoc.Document );
       // NOTE: If project is copy pasted, it has the same unique id, so the below is not reliable
@@ -375,7 +399,7 @@ namespace SpeckleRevit.UI
       return SpeckleCore.Converter.getMd5Hash( doc.PathName + doc.Title );
     }
 
-    public override string GetDocumentLocation( )
+    public override string GetDocumentLocation()
     {
       return CurrentDoc.Document.PathName;
     }
@@ -383,20 +407,23 @@ namespace SpeckleRevit.UI
 
     #region sender 
 
-    public string GetObjectSelection( )
+    public string GetObjectSelection()
     {
-      var selectionIds = CurrentDoc.Selection.GetElementIds();
       List<dynamic> selectedObjects = new List<dynamic>();
 
-      foreach ( var id in selectionIds )
+      if( CurrentDoc == null ) return JsonConvert.SerializeObject( selectedObjects ); ;
+
+      var selectionIds = CurrentDoc.Selection.GetElementIds();
+      foreach( var id in selectionIds )
       {
         var elm = CurrentDoc.Document.GetElement( id );
         var cat = elm.Category;
         var typ = elm.GetType();
         var isFam = elm is FamilyInstance;
 
-        if ( isFam ) { 
-          var fam = ( elm as FamilyInstance ).Symbol.FamilyName;
+        if( isFam )
+        {
+          var fam = (elm as FamilyInstance).Symbol.FamilyName;
         }
 
         selectedObjects.Add( new
@@ -410,14 +437,14 @@ namespace SpeckleRevit.UI
       return JsonConvert.SerializeObject( selectedObjects );
     }
 
-    public List<ObjectSelectionFilter> GetFilters( )
+    public List<ObjectSelectionFilter> GetFilters()
     {
       // TODO
       var selectionIds = CurrentDoc.Selection.GetElementIds();
 
       var selectedObjectsFilter = new ObjectSelectionFilter() { FilterName = "Selected objects", ObjectCount = selectionIds.Count };
 
-      foreach ( Category cat in CurrentDoc.Document.Settings.Categories )
+      foreach( Category cat in CurrentDoc.Document.Settings.Categories )
       {
 
       }
