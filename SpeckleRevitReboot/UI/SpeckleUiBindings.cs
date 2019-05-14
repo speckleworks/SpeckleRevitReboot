@@ -76,7 +76,6 @@ namespace SpeckleRevit.UI
       RevitApp.Application.DocumentChanged += Application_DocumentChanged;
       RevitApp.Application.DocumentOpened += Application_DocumentOpened;
       RevitApp.Application.DocumentClosed += Application_DocumentClosed;
-      //CurrentDoc.Document.
       RevitApp.Idling += ApplicationIdling;
 
 
@@ -100,7 +99,6 @@ namespace SpeckleRevit.UI
 
     private void ApplicationIdling( object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e )
     {
-      Debug.WriteLine( "App is idling yo!" );
     }
 
     #region Kit injection utils
@@ -188,7 +186,6 @@ namespace SpeckleRevit.UI
         DispatchStoreActionUi( "flushClients" );
         DispatchStoreActionUi( "getExistingClients" );
 
-        // TODO: Switch current local state to document
         Queue.Add( new Action( () =>
         {
           using( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
@@ -213,7 +210,6 @@ namespace SpeckleRevit.UI
       DispatchStoreActionUi( "flushClients" );
       DispatchStoreActionUi( "getExistingClients" );
 
-      // TODO: Get current local state from document
       Queue.Add( new Action( () =>
       {
         using( Transaction t = new Transaction( CurrentDoc.Document, "Reading Local Speckle State" ) )

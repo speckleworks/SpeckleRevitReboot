@@ -112,7 +112,7 @@ namespace SpeckleRevit.UI
             failOpts.SetFailuresPreprocessor( new ErrorEater() );
             t.SetFailureHandlingOptions( failOpts );
 
-            res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo" } );
+            res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
 
             // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
             // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 

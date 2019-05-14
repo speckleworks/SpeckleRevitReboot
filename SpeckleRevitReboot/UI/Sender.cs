@@ -53,7 +53,7 @@ namespace SpeckleRevit.UI
 
           convertedObjects.Add( conversionResult );
 
-          if( currentBucketSize > 5e5 || i >= client.objects.Count) // aim for roughly 500kb uncompressed
+          if( currentBucketSize > 5e5 || i >= client.objects.Count ) // aim for roughly 500kb uncompressed
           {
             LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
 
@@ -110,6 +110,30 @@ namespace SpeckleRevit.UI
         loadingBlurb = "Done sending."
       } ) );
 
+    }
+
+    public override void AddSelectionToSender( string args )
+    {
+      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
+
+      // TODO
+
+      var selectionIds = CurrentDoc.Selection.GetElementIds();
+
+      throw new NotImplementedException();
+    }
+
+    public override void RemoveSelectionFromSender( string args )
+    {
+      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
+
+      // TODO
+      var selectionIds = CurrentDoc.Selection.GetElementIds();
+
+
+      throw new NotImplementedException();
     }
   }
 }
