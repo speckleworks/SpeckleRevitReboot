@@ -235,32 +235,44 @@ namespace SpeckleRevit.UI
       // TODO: Notify ui that application state now differs from stream state.
       // Will require a iterating by stream rather than grouped "allStateObjects"
       var modified = e.GetModifiedElementIds();
+      var modifiedUniqueIds = modified.Select( id => CurrentDoc.Document.GetElement( id ).UniqueId );
       var allStateObjects = (from p in LocalState.SelectMany( s => s.Objects ) select p).ToList();
       var changed = false;
-      foreach( var id in modified )
+
+      var affectedStreams = new HashSet<string>();
+
+      foreach( var stream in LocalState )
       {
-        var elUniqueId = CurrentDoc.Document.GetElement( id ).UniqueId;
-        var found = allStateObjects.FirstOrDefault( o => (string) o.Properties[ "revitUniqueId" ] == elUniqueId );
-        if( found != null )
+        foreach( var id in modifiedUniqueIds )
         {
-          found.Properties[ "userModified" ] = true;
-          changed = true;
+          var found = stream.Objects.FirstOrDefault( o => (String) o.Properties[ "revitUniqueId" ] == id );
+          if( found != null )
+          {
+            found.Properties[ "userModified" ] = true;
+            changed = true;
+            affectedStreams.Add( stream.StreamId );
+          }
         }
       }
 
-      if( changed )
+      if( !changed ) return;
+
+      NotifyUi( "appstate-expired", JsonConvert.SerializeObject( new
       {
-        Queue.Add( new Action( () =>
+        affectedStreams
+      } ) );
+
+      Queue.Add( new Action( () =>
+      {
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Writing Local Speckle State" ) )
         {
-          using( Transaction t = new Transaction( CurrentDoc.Document, "Writing Local Speckle State" ) )
-          {
-            t.Start();
-            SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
-            t.Commit();
-          }
-        } ) );
-        Executor.Raise();
-      }
+          t.Start();
+          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
+
     }
 
     #endregion
@@ -272,12 +284,12 @@ namespace SpeckleRevit.UI
       ClientListWrapper.clients.Add( client );
 
       // TODO: Add stream to LocalState (do we actually need to??? hm...).
-      var myStream = new SpeckleStream() { StreamId = client.streamId as string, Objects = new List<SpeckleObject>() };
+      var myStream = new SpeckleStream() { StreamId = (string) client.streamId, Objects = new List<SpeckleObject>() };
 
       foreach( dynamic obj in client.objects )
       {
         var SpkObj = new SpeckleObject() { };
-        SpkObj.Properties[ "revitUniqueId" ] = obj.id as string;
+        SpkObj.Properties[ "revitUniqueId" ] = obj.id.ToString();
         SpkObj.Properties[ "__type" ] = "Sent Object";
         myStream.Objects.Add( SpkObj );
       }
@@ -330,11 +342,17 @@ namespace SpeckleRevit.UI
       if( index == -1 ) return;
 
       ClientListWrapper.clients.RemoveAt( index );
+
+      var lsIndex = LocalState.FindIndex( x => x.StreamId == (string) client.streamId );
+      if( lsIndex != -1 ) LocalState.RemoveAt( lsIndex );
+      
+      // persist the changes please
       Queue.Add( new Action( () =>
       {
         using( Transaction t = new Transaction( CurrentDoc.Document, "Removing Speckle Client" ) )
         {
           t.Start();
+          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
           SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
           t.Commit();
         }
