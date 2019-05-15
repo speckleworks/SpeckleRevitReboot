@@ -298,13 +298,13 @@ namespace SpeckleRevit.UI
       // TODO: Add stream to LocalState (do we actually need to??? hm...).
       var myStream = new SpeckleStream() { StreamId = (string) client.streamId, Objects = new List<SpeckleObject>() };
 
-      foreach( dynamic obj in client.objects )
-      {
-        var SpkObj = new SpeckleObject() { };
-        SpkObj.Properties[ "revitUniqueId" ] = obj.id.ToString();
-        SpkObj.Properties[ "__type" ] = "Sent Object";
-        myStream.Objects.Add( SpkObj );
-      }
+      //foreach( dynamic obj in client.objects )
+      //{
+      //  var SpkObj = new SpeckleObject() { };
+      //  SpkObj.Properties[ "revitUniqueId" ] = obj.id.ToString();
+      //  SpkObj.Properties[ "__type" ] = "Sent Object";
+      //  myStream.Objects.Add( SpkObj );
+      //}
 
       LocalState.Add( myStream );
 
@@ -319,6 +319,8 @@ namespace SpeckleRevit.UI
         }
       } ) );
       Executor.Raise();
+
+      AddSelectionToSender( args );
     }
 
     /// <summary>

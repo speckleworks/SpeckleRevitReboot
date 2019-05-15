@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Newtonsoft.Json;
 using SpeckleCore;
+using SpeckleRevit.Storage;
 
 namespace SpeckleRevit.UI
 {
@@ -115,13 +116,54 @@ namespace SpeckleRevit.UI
     public override void AddSelectionToSender( string args )
     {
       var client = JsonConvert.DeserializeObject<dynamic>( args );
-      var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
-      // TODO
+      var selectionIds = CurrentDoc.Selection.GetElementIds().Select( id => CurrentDoc.Document.GetElement( id ).UniqueId );
 
-      var selectionIds = CurrentDoc.Selection.GetElementIds();
+      // LOCAL STATE management
+      var spkObjectsToAdd = selectionIds.Select( id =>
+      {
+        var temp = new SpeckleObject();
+        temp.Properties[ "revitUniqueId" ] = id;
+        temp.Properties[ "__type" ] = "Sent Object";
+        return temp;
+      } );
 
-      throw new NotImplementedException();
+      var myStream = LocalState.FirstOrDefault( st => st.StreamId == (string) client.streamId );
+      var added = 0;
+      foreach( var obj in spkObjectsToAdd )
+      {
+        var ind = myStream.Objects.FindIndex( o => (string) o.Properties[ "revitUniqueId" ] == (string) obj.Properties[ "revitUniqueId" ] );
+        if( ind == -1 ) {
+          myStream.Objects.Add( obj );
+          added++;
+        }
+      }
+
+      var myClient = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl._id == (string) client._id );
+      myClient.objects = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(myStream.Objects));
+
+      // Persist state and clients to revit file
+      Queue.Add( new Action( () =>
+      {
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
+        {
+          t.Start();
+          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
+
+      if( added != 0 )
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = client._id,
+          expired = true,
+          objects = myClient.objects,
+          message = String.Format( "You have added {0} objects from this sender.", added )
+      } ) );
+      //throw new NotImplementedException();
     }
 
     public override void RemoveSelectionFromSender( string args )
