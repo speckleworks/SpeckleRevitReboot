@@ -240,7 +240,7 @@ namespace SpeckleRevit.UI
       var changed = false;
 
       var affectedStreams = new HashSet<string>();
-
+      var affectedClients = new List<string>();
       foreach( var stream in LocalState )
       {
         foreach( var id in modifiedUniqueIds )
@@ -250,7 +250,19 @@ namespace SpeckleRevit.UI
           {
             found.Properties[ "userModified" ] = true;
             changed = true;
-            affectedStreams.Add( stream.StreamId );
+            if( affectedStreams.Add( stream.StreamId ) )
+            {
+              var client = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl.streamId == stream.StreamId );
+              if(client!=null)
+              {
+                NotifyUi( "update-client", JsonConvert.SerializeObject( new
+                {
+                  _id = client._id,
+                  expired = true,
+                  message = "The stream state and the application state do not match."
+                } ) );
+              }
+            }
           }
         }
       }
