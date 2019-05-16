@@ -115,6 +115,27 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+ <!--  <Target Name="BeforeBuild">
+    <MakeDir Directories="$(TargetDir)\app" />
+    <ItemGroup>
+    	<UiAppSrc Include="$(SolutionDir)SpeckleUi\App\dist\**\*.*"></UiAppSrc>
+    </ItemGroup>
+    <Copy SourceFiles="$(UiAppSrc)" DestinationFolder="$(TargetDir)\app"/>
+  </Target> -->
+<!--   <Target Name="BeforeBuild">
+    <MakeDir Directories="$(TargetDir)\app\dist" />
+    <MakeDir Directories="$(TargetDir)\app\dist\js" />
+    <Copy SourceFiles="$(SolutionDir)SpeckleUi\App\dist\index.html" DestinationFolder="$(TargetDir)\app" />
+    <Copy SourceFiles="$(SolutionDir)SpeckleUi\App\dist\js\*.js" DestinationFolder="$(TargetDir)\app\dist\js" />
+  </Target> -->
+  <Target Name="BeforeBuild">
+  	<MakeDir Directories="$(SolutionDir)\$(ConfigurationName)\app" />
+    <ItemGroup>
+        <WebApp Include="$(SolutionDir)SpeckleUi\App\dist\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WebApp)" DestinationFolder="$(SolutionDir)\$(ConfigurationName)\app\%(RecursiveDir)"/>
+  </Target>
+  <!-- End Web app copy -->
   <Target Name="AfterBuild">
     <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit" />
     <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2019" />

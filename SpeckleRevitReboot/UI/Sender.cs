@@ -104,7 +104,7 @@ namespace SpeckleRevit.UI
       var baseProps = new Dictionary<string, object>();
 
       // TODO: format units to something rational
-      baseProps[ "units" ] = CurrentDoc.Document.GetUnits().ToString();
+      baseProps[ "units" ] = CurrentDoc.Document.DisplayUnitSystem == DisplayUnit.IMPERIAL ? "imperial" : "meters";
       baseProps[ "units_secondtry" ] = ug.ToString();
 
       myStream.BaseProperties = baseProps;
