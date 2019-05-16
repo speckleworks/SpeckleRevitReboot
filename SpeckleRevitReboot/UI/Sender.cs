@@ -26,7 +26,9 @@ namespace SpeckleRevit.UI
 
       int i = 0;
       long currentBucketSize = 0;
-
+      var errors = "";
+      var failedSend = 0;
+      var failedConvert = 0;
       foreach( var obj in client.objects )
       {
         NotifyUi( "update-client", JsonConvert.SerializeObject( new
@@ -71,7 +73,12 @@ namespace SpeckleRevit.UI
             }
             catch( Exception e )
             {
-              // TODO: Handle object creation error.
+              failedSend += convertedObjects.Count;
+              NotifyUi( "update-client", JsonConvert.SerializeObject( new
+              {
+                _id = (string) client._id,
+                errors = "Failed to send " + failedSend + " objects."
+              } ) );
             }
             currentBucketSize = 0;
             convertedObjects = new List<SpeckleObject>(); // reset the chunkness
@@ -79,9 +86,17 @@ namespace SpeckleRevit.UI
         }
         catch( Exception e )
         {
-          // TODO: Handle conversion error
+          failedConvert++;
+          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          {
+            _id = (string) client._id,
+            errors = "Failed to convert " + failedConvert + " objects."
+          } ) );
         }
       }
+
+      if(failedConvert >0 ) errors += String.Format("Failed to convert a total of {0} objects. ", failedConvert);
+      if( failedSend > 0 ) errors += String.Format( "Failed to send a total of {0} objects. ", failedSend );
 
       var myStream = new SpeckleStream() { Objects = placeholders };
 
@@ -108,7 +123,8 @@ namespace SpeckleRevit.UI
       {
         _id = (string) client._id,
         loading = false,
-        loadingBlurb = "Done sending."
+        loadingBlurb = "Done sending.",
+        errors
       } ) );
 
     }

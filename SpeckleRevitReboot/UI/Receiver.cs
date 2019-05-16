@@ -58,9 +58,10 @@ namespace SpeckleRevit.UI
 
       NotifyUi( "update-client", JsonConvert.SerializeObject( new
       {
-        _id = ( string ) client._id,
+        _id = (string) client._id,
         loading = true,
-        loadingBlurb = "Deleting " + toDelete.Count() + " objects."
+        loadingBlurb = "Deleting " + toDelete.Count() + " objects.",
+        objects = stream.Objects
       } ) );
 
       // DELETION OF OLD OBJECTS
@@ -89,7 +90,7 @@ namespace SpeckleRevit.UI
       // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
 
       var tempList = new List<SpeckleObject>();
-      int i = 0;
+      int i = 0, failedToBake = 0;
       foreach ( var mySpkObj in ToAddOrMod )
       {
         Queue.Add( new Action( ( ) =>
@@ -112,51 +113,63 @@ namespace SpeckleRevit.UI
             failOpts.SetFailuresPreprocessor( new ErrorEater() );
             t.SetFailureHandlingOptions( failOpts );
 
-            res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
-
-            // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
-            // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
-            if ( res is Element )
+            try
             {
-              // creates a shadow copy of the baked object to store in our local state. 
-              var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
-              myObject._id = mySpkObj._id;
-              myObject.ApplicationId = mySpkObj.ApplicationId;
-              myObject.Properties[ "__type" ] = mySpkObj.Type;
-              myObject.Properties[ "revitUniqueId" ] = ( ( Element ) res ).UniqueId;
-              myObject.Properties[ "revitId" ] = ( ( Element ) res ).Id.ToString();
-              myObject.Properties[ "userModified" ] = false;
 
-              tempList.Add( myObject );
-            }
+              res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
 
-            // TODO: Handle scenario when one object creates more objects. 
-            // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
-            if ( res is System.Collections.IEnumerable )
-            {
-              int k = 0;
-              var xx = ( ( IEnumerable<object> ) res ).Cast<Element>();
-              foreach ( var elm in xx )
+              // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
+              // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
+              if( res is Element )
               {
-                var myObject = new SpeckleObject();
+                // creates a shadow copy of the baked object to store in our local state. 
+                var myObject = new SpeckleObject() { Properties = new Dictionary<string, object>() };
                 myObject._id = mySpkObj._id;
                 myObject.ApplicationId = mySpkObj.ApplicationId;
                 myObject.Properties[ "__type" ] = mySpkObj.Type;
-                myObject.Properties[ "revitUniqueId" ] = ( ( Element ) elm ).UniqueId;
-                myObject.Properties[ "revitId" ] = ( ( Element ) elm ).Id.ToString();
+                myObject.Properties[ "revitUniqueId" ] = ((Element) res).UniqueId;
+                myObject.Properties[ "revitId" ] = ((Element) res).Id.ToString();
                 myObject.Properties[ "userModified" ] = false;
-                myObject.Properties[ "orderIndex" ] = k++; // keeps track of which elm it actually is
 
                 tempList.Add( myObject );
               }
+
+              // TODO: Handle scenario when one object creates more objects. 
+              // ie: SpeckleElements wall with a base curve that is a polyline/polycurve
+              if( res is System.Collections.IEnumerable )
+              {
+                int k = 0;
+                var xx = ((IEnumerable<object>) res).Cast<Element>();
+                foreach( var elm in xx )
+                {
+                  var myObject = new SpeckleObject();
+                  myObject._id = mySpkObj._id;
+                  myObject.ApplicationId = mySpkObj.ApplicationId;
+                  myObject.Properties[ "__type" ] = mySpkObj.Type;
+                  myObject.Properties[ "revitUniqueId" ] = ((Element) elm).UniqueId;
+                  myObject.Properties[ "revitId" ] = ((Element) elm).Id.ToString();
+                  myObject.Properties[ "userModified" ] = false;
+                  myObject.Properties[ "orderIndex" ] = k++; // keeps track of which elm it actually is
+
+                  tempList.Add( myObject );
+                }
+              }
+            } catch( Exception e )
+            {
+              failedToBake++;
             }
 
             t.Commit();
           }
-
           i++;
         } ) );
         Executor.Raise();
+      }
+
+      string errors = "";
+      if( failedToBake > 0 )
+      {
+        errors = String.Format( "Failed to convert and bake {0} objects.", failedToBake );
       }
 
       Queue.Add( new Action( ( ) =>
@@ -183,7 +196,8 @@ namespace SpeckleRevit.UI
           _id = ( string ) client._id,
           loading = false,
           isLoadingIndeterminate = true,
-          loadingBlurb = string.Format( "Done." )
+          loadingBlurb = string.Format( "Done." ),
+          errors
         } ) );
 
       } ) );
