@@ -40,7 +40,7 @@ namespace SpeckleRevit.UI
 
         try
         {
-          var revitElement = CurrentDoc.Document.GetElement( (string) obj.id );
+          var revitElement = CurrentDoc.Document.GetElement( (string) obj.properties[ "revitUniqueId" ] );
 
           var conversionResult = SpeckleCore.Converter.Serialise( revitElement );
           var byteCount = Converter.getBytes( conversionResult ).Length;
@@ -133,14 +133,15 @@ namespace SpeckleRevit.UI
       foreach( var obj in spkObjectsToAdd )
       {
         var ind = myStream.Objects.FindIndex( o => (string) o.Properties[ "revitUniqueId" ] == (string) obj.Properties[ "revitUniqueId" ] );
-        if( ind == -1 ) {
+        if( ind == -1 )
+        {
           myStream.Objects.Add( obj );
           added++;
         }
       }
 
       var myClient = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl._id == (string) client._id );
-      myClient.objects = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(myStream.Objects));
+      myClient.objects = JsonConvert.DeserializeObject<dynamic>( JsonConvert.SerializeObject( myStream.Objects ) );
 
       // Persist state and clients to revit file
       Queue.Add( new Action( () =>
@@ -162,20 +163,49 @@ namespace SpeckleRevit.UI
           expired = true,
           objects = myClient.objects,
           message = String.Format( "You have added {0} objects from this sender.", added )
-      } ) );
+        } ) );
       //throw new NotImplementedException();
     }
 
     public override void RemoveSelectionFromSender( string args )
     {
       var client = JsonConvert.DeserializeObject<dynamic>( args );
-      var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
+      var myStream = LocalState.FirstOrDefault( st => st.StreamId == (string) client.streamId );
+      var myClient = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl._id == (string) client._id );
 
-      // TODO
-      var selectionIds = CurrentDoc.Selection.GetElementIds();
+      var selectionIds = CurrentDoc.Selection.GetElementIds().Select( id => CurrentDoc.Document.GetElement( id ).UniqueId );
+      var removed = 0;
+      foreach( var revitUniqueId in selectionIds )
+      {
+        var index = myStream.Objects.FindIndex( o => (string) o.Properties[ "revitUniqueId" ] == revitUniqueId );
+        if( index == -1 ) continue;
+        myStream.Objects.RemoveAt( index );
+        removed++;
+      }
 
+      myClient.objects = JsonConvert.DeserializeObject<dynamic>( JsonConvert.SerializeObject( myStream.Objects ) );
 
-      throw new NotImplementedException();
+      // Persist state and clients to revit file
+      Queue.Add( new Action( () =>
+      {
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
+        {
+          t.Start();
+          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
+          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
+
+      if( removed != 0 )
+        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        {
+          _id = client._id,
+          expired = true,
+          objects = myClient.objects,
+          message = String.Format( "You have removed {0} objects from this sender.", removed )
+        } ) );
     }
   }
 }
