@@ -30,3 +30,7 @@ after_build:
   # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleRhinoPlugin\SpeckleWinR6\bin\Release\*"
   # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleGrasshopper\bin\Release\*"
   - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\Release\*"
+ 
+ artifacts:
+  path: SpeckleRevit.zip
+  name: Release
