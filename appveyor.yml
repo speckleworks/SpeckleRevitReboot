@@ -1,6 +1,9 @@
 version: '1.0.{build}'
 image: Visual Studio 2017
 configuration: Release
+cache:
+  - '%LocalAppData%\NuGet\v3-cache'
+
 install:
   # init and update submodules
   - git submodule update --recursive --init
@@ -16,7 +19,7 @@ before_build:
   - npm install
   - npm run build
   # return to build dir
-  - cd ..
+  - cd ..\..
 build:
   project: SpeckleRevit.sln
   verbosity: minimal
