@@ -1,11 +1,12 @@
-﻿using System;
+﻿extern alias SpeckleNewtonsoft;
+using SNJ = SpeckleNewtonsoft.Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
-using Newtonsoft.Json;
 using SpeckleCore;
 
 namespace SpeckleRevit.UI
@@ -20,10 +21,10 @@ namespace SpeckleRevit.UI
     /// <param name="args">Serialised client coming from the ui.</param>
     public override void BakeReceiver( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
       var apiClient = new SpeckleApiClient( ( string ) client.account.RestApi ) { AuthToken = ( string ) client.account.Token };
 
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
       {
         _id = ( string ) client._id,
         loading = true,
@@ -56,7 +57,7 @@ namespace SpeckleRevit.UI
 
       var (toDelete, ToAddOrMod) = DiffStreamStates( previousStream, stream );
 
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
       {
         _id = (string) client._id,
         loading = true,
@@ -95,7 +96,7 @@ namespace SpeckleRevit.UI
       {
         Queue.Add( new Action( ( ) =>
         {
-          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
           {
             _id = ( string ) client._id,
             loading = true,
@@ -174,7 +175,7 @@ namespace SpeckleRevit.UI
 
       Queue.Add( new Action( ( ) =>
       {
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
           _id = ( string ) client._id,
           loading = true,
@@ -191,7 +192,7 @@ namespace SpeckleRevit.UI
           Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
           t.Commit();
         }
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
           _id = ( string ) client._id,
           loading = false,

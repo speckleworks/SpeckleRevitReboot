@@ -1,4 +1,6 @@
-﻿using System;
+﻿extern alias SpeckleNewtonsoft;
+using SNJ = SpeckleNewtonsoft.Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +10,6 @@ using System.Timers;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Newtonsoft.Json;
 using SpeckleCore;
 using SpeckleRevit.Storage;
 using SpeckleUiBase;
@@ -91,7 +92,7 @@ namespace SpeckleRevit.UI
       if( CurrentDoc == null ) return;
       var selectedObjectsCount = CurrentDoc != null ? CurrentDoc.Selection.GetElementIds().Count : 0;
 
-      NotifyUi( "update-selection-count", JsonConvert.SerializeObject( new
+      NotifyUi( "update-selection-count", SNJ.JsonConvert.SerializeObject( new
       {
         selectedObjectsCount
       } ) );
@@ -255,7 +256,7 @@ namespace SpeckleRevit.UI
               var client = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl.streamId == stream.StreamId );
               if(client!=null)
               {
-                NotifyUi( "update-client", JsonConvert.SerializeObject( new
+                NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
                 {
                   _id = client._id,
                   expired = true,
@@ -269,7 +270,7 @@ namespace SpeckleRevit.UI
 
       if( !changed ) return;
 
-      NotifyUi( "appstate-expired", JsonConvert.SerializeObject( new
+      NotifyUi( "appstate-expired", SNJ.JsonConvert.SerializeObject( new
       {
         affectedStreams
       } ) );
@@ -292,7 +293,7 @@ namespace SpeckleRevit.UI
     #region client add/remove + serialisation/deserialisation
     public override void AddSender( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
       ClientListWrapper.clients.Add( client );
 
       // TODO: Add stream to LocalState (do we actually need to??? hm...).
@@ -329,7 +330,7 @@ namespace SpeckleRevit.UI
     /// <param name="args"></param>
     public override void AddReceiver( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
       ClientListWrapper.clients.Add( client );
 
       Queue.Add( new Action( () =>
@@ -350,7 +351,7 @@ namespace SpeckleRevit.UI
     /// <param name="args"></param>
     public override void RemoveClient( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
       var index = ClientListWrapper.clients.FindIndex( cl => cl.clientId == client.clientId );
 
       if( index == -1 ) return;
@@ -387,7 +388,7 @@ namespace SpeckleRevit.UI
       // Set them up in the class so we're aware of them
       ClientListWrapper = myReadClients;
 
-      return JsonConvert.SerializeObject( myReadClients.clients );
+      return SNJ.JsonConvert.SerializeObject( myReadClients.clients );
     }
 
     #endregion
@@ -440,7 +441,7 @@ namespace SpeckleRevit.UI
     {
       List<dynamic> selectedObjects = new List<dynamic>();
 
-      if( CurrentDoc == null ) return JsonConvert.SerializeObject( selectedObjects ); ;
+      if( CurrentDoc == null ) return SNJ.JsonConvert.SerializeObject( selectedObjects ); ;
 
       var selectionIds = CurrentDoc.Selection.GetElementIds();
       foreach( var id in selectionIds )
@@ -463,7 +464,7 @@ namespace SpeckleRevit.UI
         } );
       }
 
-      return JsonConvert.SerializeObject( selectedObjects );
+      return SNJ.JsonConvert.SerializeObject( selectedObjects );
     }
 
     public List<ObjectSelectionFilter> GetFilters()

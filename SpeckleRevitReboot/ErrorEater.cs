@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Newtonsoft.Json;
 using SpeckleCore;
 using SpeckleRevit.Storage;
 using SpeckleUiBase;

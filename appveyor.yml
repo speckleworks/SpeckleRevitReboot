@@ -1,0 +1,27 @@
+version: '1.0.{build}'
+image: Visual Studio 2017
+configuration: Release
+install:
+  # init and update submodules
+  - git submodule update --recursive --init
+  # update node.js to latest 10.x release
+  - ps: Install-Product node 10
+  - node --version
+  - npm --version
+before_build:
+  - nuget restore
+  - mkdir Release
+  # install npm dependencies for SpeckleUi and build
+  - cd SpeckleUi\App
+  - npm install
+  - npm run build
+  # return to build dir
+  - cd ..
+build:
+  project: SpeckleRevit.sln
+  verbosity: minimal
+after_build:
+  # zip everything up into a .rhi package
+  # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleRhinoPlugin\SpeckleWinR6\bin\Release\*"
+  # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleGrasshopper\bin\Release\*"
+  - 7z a SpeckleRevit.zip "$Env:%APPVEYOR_BUILD_FOLDER%\Release\*"

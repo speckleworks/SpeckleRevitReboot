@@ -1,10 +1,11 @@
-﻿using System;
+﻿extern alias SpeckleNewtonsoft;
+using SNJ = SpeckleNewtonsoft.Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
-using Newtonsoft.Json;
 using SpeckleCore;
 using SpeckleRevit.Storage;
 
@@ -18,7 +19,7 @@ namespace SpeckleRevit.UI
     // perhaps we're not storing the right sent object (localcontext.addsentobject)
     public override void UpdateSender( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
       var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
       var convertedObjects = new List<SpeckleObject>();
@@ -31,7 +32,7 @@ namespace SpeckleRevit.UI
       var failedConvert = 0;
       foreach( var obj in client.objects )
       {
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
           _id = (string) client._id,
           loading = true,
@@ -74,7 +75,7 @@ namespace SpeckleRevit.UI
             catch( Exception e )
             {
               failedSend += convertedObjects.Count;
-              NotifyUi( "update-client", JsonConvert.SerializeObject( new
+              NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
               {
                 _id = (string) client._id,
                 errors = "Failed to send " + failedSend + " objects."
@@ -87,7 +88,7 @@ namespace SpeckleRevit.UI
         catch( Exception e )
         {
           failedConvert++;
-          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
           {
             _id = (string) client._id,
             errors = "Failed to convert " + failedConvert + " objects."
@@ -109,7 +110,7 @@ namespace SpeckleRevit.UI
 
       myStream.BaseProperties = baseProps;
 
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
       {
         _id = (string) client._id,
         loading = true,
@@ -119,7 +120,7 @@ namespace SpeckleRevit.UI
 
       var response = apiClient.StreamUpdateAsync( (string) client.streamId, myStream ).Result;
 
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
       {
         _id = (string) client._id,
         loading = false,
@@ -131,7 +132,7 @@ namespace SpeckleRevit.UI
 
     public override void AddSelectionToSender( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
 
       var selectionIds = CurrentDoc.Selection.GetElementIds().Select( id => CurrentDoc.Document.GetElement( id ).UniqueId );
 
@@ -157,7 +158,7 @@ namespace SpeckleRevit.UI
       }
 
       var myClient = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl._id == (string) client._id );
-      myClient.objects = JsonConvert.DeserializeObject<dynamic>( JsonConvert.SerializeObject( myStream.Objects ) );
+      myClient.objects = SNJ.JsonConvert.DeserializeObject<dynamic>( SNJ.JsonConvert.SerializeObject( myStream.Objects ) );
 
       // Persist state and clients to revit file
       Queue.Add( new Action( () =>
@@ -173,7 +174,7 @@ namespace SpeckleRevit.UI
       Executor.Raise();
 
       if( added != 0 )
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
           _id = client._id,
           expired = true,
@@ -185,7 +186,7 @@ namespace SpeckleRevit.UI
 
     public override void RemoveSelectionFromSender( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
       var myStream = LocalState.FirstOrDefault( st => st.StreamId == (string) client.streamId );
       var myClient = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl._id == (string) client._id );
 
@@ -199,7 +200,7 @@ namespace SpeckleRevit.UI
         removed++;
       }
 
-      myClient.objects = JsonConvert.DeserializeObject<dynamic>( JsonConvert.SerializeObject( myStream.Objects ) );
+      myClient.objects = SNJ.JsonConvert.DeserializeObject<dynamic>( SNJ.JsonConvert.SerializeObject( myStream.Objects ) );
 
       // Persist state and clients to revit file
       Queue.Add( new Action( () =>
@@ -215,7 +216,7 @@ namespace SpeckleRevit.UI
       Executor.Raise();
 
       if( removed != 0 )
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
           _id = client._id,
           expired = true,

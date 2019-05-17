@@ -7,6 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeckleRevit", "SpeckleRevi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F7EFBA3A-9B75-4411-84BB-AB10CB0D18F7}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
 		readme.md = readme.md
 	EndProjectSection
 EndProject
