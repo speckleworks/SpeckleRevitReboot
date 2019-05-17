@@ -20,6 +20,8 @@ before_build:
   - npm run build
   # return to build dir
   - cd ..\..
+  # maybe needed for local build events to go through 
+  - mkdir %localappdata%\Autodesk\REVIT\Addins\2019
 build:
   project: SpeckleRevit.sln
   verbosity: minimal

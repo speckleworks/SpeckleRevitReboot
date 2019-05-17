@@ -140,6 +140,7 @@
   <Target Name="AfterBuild">
     <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit" />
     <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2019" />
+    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(SolutionDir)\$(ConfigurationName)" />
     <ItemGroup>
       <MySourceFiles Include="$(ProjectDir)bin\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
