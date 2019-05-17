@@ -29,4 +29,4 @@ after_build:
   # zip everything up into a .rhi package
   # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleRhinoPlugin\SpeckleWinR6\bin\Release\*"
   # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleGrasshopper\bin\Release\*"
-  - 7z a SpeckleRevit.zip "$Env:%APPVEYOR_BUILD_FOLDER%\Release\*"
+  - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\Release\*"
