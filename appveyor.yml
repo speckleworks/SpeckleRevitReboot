@@ -9,7 +9,7 @@ install:
   - node --version
   - npm --version
 before_build:
-  - nuget restore
+  - nuget restore SpeckleRevit.sln
   - mkdir Release
   # install npm dependencies for SpeckleUi and build
   - cd SpeckleUi\App
