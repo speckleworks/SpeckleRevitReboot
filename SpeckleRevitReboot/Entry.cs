@@ -51,6 +51,9 @@ namespace SpeckleRevit
 
         // Initialise the window
         SpeckleWindow = new SpeckleUiWindow( bindings );
+
+        var helper = new System.Windows.Interop.WindowInteropHelper( SpeckleWindow );
+        helper.Owner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
         
         // TODO: find a way to set the parent/owner of the speckle window so it minimises/maximises etc. together with the revit window.
         SpeckleWindow.Show();
