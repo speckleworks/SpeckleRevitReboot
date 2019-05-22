@@ -157,6 +157,7 @@ namespace SpeckleRevit.UI
               }
             } catch( Exception e )
             {
+              //if(e.Message.Contains("missing"))
               failedToBake++;
             }
 
@@ -172,6 +173,8 @@ namespace SpeckleRevit.UI
       {
         errors = String.Format( "Failed to convert and bake {0} objects.", failedToBake );
       }
+
+      var test = GetAndClearMissingFamilies();
 
       Queue.Add( new Action( ( ) =>
       {

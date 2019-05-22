@@ -171,6 +171,27 @@ namespace SpeckleRevit.UI
       }
     }
 
+    public List<string> GetAndClearMissingFamilies()
+    {
+      var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+      foreach( var ass in assemblies )
+      {
+        var types = ass.GetTypes();
+        foreach( var type in types )
+        {
+          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          {
+            if( type.GetProperties().Select( p => p.Name ).Contains( "MissingFamilies" ) )
+            {
+              var test = type.GetProperty( "MissingFamilies" ).GetValue( type );
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
     public void ExecuteAction( Action a )
     {
       Queue.Add( a );
