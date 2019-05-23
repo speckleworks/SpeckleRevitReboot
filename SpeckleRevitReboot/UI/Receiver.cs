@@ -155,6 +155,9 @@ namespace SpeckleRevit.UI
                   tempList.Add( myObject );
                 }
               }
+
+              if( res is SpeckleObject || res == null ) failedToBake++;
+
             } catch( Exception e )
             {
               //if(e.Message.Contains("missing"))
@@ -167,14 +170,6 @@ namespace SpeckleRevit.UI
         } ) );
         Executor.Raise();
       }
-
-      string errors = "";
-      if( failedToBake > 0 )
-      {
-        errors = String.Format( "Failed to convert and bake {0} objects.", failedToBake );
-      }
-
-     
 
       Queue.Add( new Action( ( ) =>
       {
@@ -196,10 +191,17 @@ namespace SpeckleRevit.UI
           t.Commit();
         }
 
+        string errors = "";
+        if( failedToBake > 0 )
+        {
+          errors = String.Format( "<v-layout row wrap><v-flex xs12>Failed to convert and bake {0} objects.</v-flex></v-layout>", failedToBake );
+        }
+
         var missing = GetAndClearMissingFamilies();
         if( missing!=null && missing.Count > 0 )
         {
-          errors += "<v-spacer></v-spacer>" +
+          errors += "" +
+          //errors += "<v-divider></v-divider>" +
           "<v-layout row wrap><v-flex xs12>" +
           "<strong>Missing families:</strong>&nbsp;&nbsp;";
 
