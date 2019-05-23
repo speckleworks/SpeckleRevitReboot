@@ -171,6 +171,10 @@ namespace SpeckleRevit.UI
       }
     }
 
+    /// <summary>
+    /// Gets from a speckle kit a "MissingFamiliesAndTypes" string hashset. This is populated during conversion to revit by the ToNative methods. This list is then sent to the UI.
+    /// </summary>
+    /// <returns></returns>
     public List<string> GetAndClearMissingFamilies()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
@@ -181,9 +185,15 @@ namespace SpeckleRevit.UI
         {
           if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
           {
-            if( type.GetProperties().Select( p => p.Name ).Contains( "MissingFamilies" ) )
+            var typessss = type.GetProperties().Select( p => p.Name ).ToList();
+            if( type.GetProperties().Select( p => p.Name ).Contains( "MissingFamiliesAndTypes" ) )
             {
-              var test = type.GetProperty( "MissingFamilies" ).GetValue( type );
+              var missingSet = type.GetProperty( "MissingFamiliesAndTypes" ).GetValue( type );
+              var missingList = ((HashSet<string>) missingSet).ToList();
+
+              type.GetProperty( "MissingFamiliesAndTypes" ).SetValue( null, new HashSet<string>() );
+
+              return missingList;
             }
           }
         }
@@ -275,7 +285,7 @@ namespace SpeckleRevit.UI
             if( affectedStreams.Add( stream.StreamId ) )
             {
               var client = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl.streamId == stream.StreamId );
-              if(client!=null)
+              if( client != null )
               {
                 NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
                 {
@@ -381,7 +391,7 @@ namespace SpeckleRevit.UI
 
       var lsIndex = LocalState.FindIndex( x => x.StreamId == (string) client.streamId );
       if( lsIndex != -1 ) LocalState.RemoveAt( lsIndex );
-      
+
       // persist the changes please
       Queue.Add( new Action( () =>
       {
@@ -418,13 +428,38 @@ namespace SpeckleRevit.UI
 
     public override void AddObjectsToSender( string args )
     {
-      throw new NotImplementedException();
+      // NOTE: implemented in the Receiver partial class extension file. Kept here just to prevent compiler errors.
     }
 
     public override void RemoveObjectsFromSender( string args )
     {
-      throw new NotImplementedException();
+      // NOTE: implemented in the Receiver partial class extension file. Kept here just to prevent compiler errors.
     }
+
+    /// <summary>
+    /// Selects the objects from a specific client (receiver or sender).
+    /// </summary>
+    /// <param name="args"></param>
+    public override void SelectClientObjects( string args )
+    {
+      var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
+      var objIds = LocalState.Find( stream => stream.StreamId == (string) client.streamId ).Objects.Select(obj => (string) obj.Properties[ "revitUniqueId" ] );
+
+      Queue.Add( new Action( () =>
+      {
+        using( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Select" ) )
+        {
+          t.Start();
+          var objElIds = objIds.Select( obj => CurrentDoc.Document.GetElement( obj ).Id ).ToList();
+          var myUiDoc = new UIDocument( CurrentDoc.Document );
+          myUiDoc.Selection.SetElementIds( objElIds );
+          myUiDoc.ShowElements( objElIds );
+          t.Commit();
+        }
+      } ) );
+      Executor.Raise();
+    }
+
     #endregion
 
     #region document info

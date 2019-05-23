@@ -174,13 +174,13 @@ namespace SpeckleRevit.UI
         errors = String.Format( "Failed to convert and bake {0} objects.", failedToBake );
       }
 
-      var test = GetAndClearMissingFamilies();
+     
 
       Queue.Add( new Action( ( ) =>
       {
         NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
-          _id = ( string ) client._id,
+          _id = (string) client._id,
           loading = true,
           isLoadingIndeterminate = true,
           loadingBlurb = string.Format( "Updating shadow state." )
@@ -189,12 +189,28 @@ namespace SpeckleRevit.UI
         // set the local state stream's object list, and inject it in the kits, persist it in the doc
         previousStream.Objects = tempList;
         InjectStateInKits();
-        using ( var t = new Transaction( CurrentDoc.Document, "Speckle State Save" ) )
+        using( var t = new Transaction( CurrentDoc.Document, "Speckle State Save" ) )
         {
           t.Start();
           Storage.SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
           t.Commit();
         }
+
+        var missing = GetAndClearMissingFamilies();
+        if( missing!=null && missing.Count > 0 )
+        {
+          errors += "<v-spacer></v-spacer>" +
+          "<v-layout row wrap><v-flex xs12>" +
+          "<strong>Missing families:</strong>&nbsp;&nbsp;";
+
+          foreach( var fam in missing )
+          {
+            errors += string.Format( "<code>{0}</code>&nbsp;", fam );
+          }
+
+          errors += "</v-flex></v-layout>";
+        }
+
         NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
           _id = ( string ) client._id,
