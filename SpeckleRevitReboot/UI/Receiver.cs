@@ -22,35 +22,41 @@ namespace SpeckleRevit.UI
     public override void BakeReceiver( string args )
     {
       var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
-      var apiClient = new SpeckleApiClient( ( string ) client.account.RestApi ) { AuthToken = ( string ) client.account.Token };
+      var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
       NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
       {
-        _id = ( string ) client._id,
+        _id = (string) client._id,
         loading = true,
         loadingBlurb = "Getting stream from server..."
       } ) );
 
+      var previousStream = LocalState.FirstOrDefault( s => s.StreamId == (string) client.streamId );
+      var stream = apiClient.StreamGetAsync( (string) client.streamId, "" ).Result.Resource;
 
-      var previousStream = LocalState.FirstOrDefault( s => s.StreamId == ( string ) client.streamId );
-      var stream = apiClient.StreamGetAsync( ( string ) client.streamId, "" ).Result.Resource;
-
-      InjectScaleInKits( GetScale( stream ) );
+      InjectScaleInKits( GetScale( (string) stream.BaseProperties.units ) );
+      var test = stream.BaseProperties.unitsDictionary;
+      if( test != null )
+      {
+        var secondTest = SNJ.JsonConvert.DeserializeObject<Dictionary<string, string>>( SNJ.JsonConvert.SerializeObject( test ) );
+        InjectUnitDictionaryInKits( secondTest );
+      }
+      else InjectUnitDictionaryInKits( null ); // make sure it's not there to potentially muddy the waters on other conversions
 
       // If it's the first time we bake this stream, create a local shadow copy
-      if ( previousStream == null )
+      if( previousStream == null )
       {
         previousStream = new SpeckleStream() { StreamId = stream.StreamId, Objects = new List<SpeckleObject>() };
         LocalState.Add( previousStream );
       }
 
-      LocalContext.GetCachedObjects( stream.Objects, ( string ) client.account.RestApi );
+      LocalContext.GetCachedObjects( stream.Objects, (string) client.account.RestApi );
       var payload = stream.Objects.Where( o => o.Type == "Placeholder" ).Select( obj => obj._id ).ToArray();
 
       // TODO: Orchestrate & save in cache afterwards!
       var objects = apiClient.ObjectGetBulkAsync( payload, "" ).Result.Resources;
 
-      foreach ( var obj in objects )
+      foreach( var obj in objects )
       {
         stream.Objects[ stream.Objects.FindIndex( o => o._id == obj._id ) ] = obj;
       }
@@ -66,17 +72,17 @@ namespace SpeckleRevit.UI
       } ) );
 
       // DELETION OF OLD OBJECTS
-      if ( toDelete.Count() > 0 )
+      if( toDelete.Count() > 0 )
       {
-        Queue.Add( new Action( ( ) =>
+        Queue.Add( new Action( () =>
         {
-          using ( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Delete (" + ( string ) client.streamId + ")" ) )
+          using( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Delete (" + (string) client.streamId + ")" ) )
           {
             t.Start();
-            foreach ( var obj in toDelete )
+            foreach( var obj in toDelete )
             {
               var myObj = previousStream.Objects.FirstOrDefault( o => o._id == obj._id );
-              if ( myObj != null )
+              if( myObj != null )
               {
                 var elem = CurrentDoc.Document.GetElement( myObj.Properties[ "revitUniqueId" ] as string );
                 CurrentDoc.Document.Delete( elem.Id );
@@ -92,21 +98,21 @@ namespace SpeckleRevit.UI
 
       var tempList = new List<SpeckleObject>();
       int i = 0, failedToBake = 0;
-      foreach ( var mySpkObj in ToAddOrMod )
+      foreach( var mySpkObj in ToAddOrMod )
       {
-        Queue.Add( new Action( ( ) =>
+        Queue.Add( new Action( () =>
         {
           NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
           {
-            _id = ( string ) client._id,
+            _id = (string) client._id,
             loading = true,
             isLoadingIndeterminate = false,
-            loadingProgress = 1f * i/ToAddOrMod.Count * 100,
+            loadingProgress = 1f * i / ToAddOrMod.Count * 100,
             loadingBlurb = string.Format( "Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count )
           } ) );
 
           object res;
-          using ( var t = new Transaction( CurrentDoc.Document, "Speckle Bake " + mySpkObj._id ) )
+          using( var t = new Transaction( CurrentDoc.Document, "Speckle Bake " + mySpkObj._id ) )
           {
             t.Start();
 
@@ -158,7 +164,8 @@ namespace SpeckleRevit.UI
 
               if( res is SpeckleObject || res == null ) failedToBake++;
 
-            } catch( Exception e )
+            }
+            catch( Exception e )
             {
               //if(e.Message.Contains("missing"))
               failedToBake++;
@@ -171,7 +178,7 @@ namespace SpeckleRevit.UI
         Executor.Raise();
       }
 
-      Queue.Add( new Action( ( ) =>
+      Queue.Add( new Action( () =>
       {
         NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
@@ -198,7 +205,7 @@ namespace SpeckleRevit.UI
         }
 
         var missing = GetAndClearMissingFamilies();
-        if( missing!=null && missing.Count > 0 )
+        if( missing != null && missing.Count > 0 )
         {
           errors += "" +
           //errors += "<v-divider></v-divider>" +
@@ -215,7 +222,7 @@ namespace SpeckleRevit.UI
 
         NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
         {
-          _id = ( string ) client._id,
+          _id = (string) client._id,
           loading = false,
           isLoadingIndeterminate = true,
           loadingBlurb = string.Format( "Done." ),
@@ -239,7 +246,7 @@ namespace SpeckleRevit.UI
       {
         var appIdMatch = New.Objects.FirstOrDefault( x => x.ApplicationId == obj.ApplicationId );
         var idMatch = New.Objects.FirstOrDefault( x => x._id == obj._id );
-        return ( appIdMatch == null ) && ( idMatch == null );
+        return (appIdMatch == null) && (idMatch == null);
       } ).ToList();
 
       var ToModOrAdd = New.Objects;
@@ -247,40 +254,39 @@ namespace SpeckleRevit.UI
     }
 
     /// <summary>
-    /// Gets the scaling factor from a stream's units.
+    /// Gets the scaling factor to/from feet based on the passed in unit string. Used internally by the kits for geometric scaling of primitives.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <returns></returns>
-    private double GetScale( SpeckleStream stream )
+    /// <param name="units">Currently supported: kilometers, meters, centimeters, millimeters, miles, feet, inches.</param>
+    /// <returns>the scaling factor.</returns>
+    private double GetScale( string units )
     {
-      var units = ( ( string ) stream.BaseProperties.units ).ToLower();
-
+      //var units = ( ( string ) stream.BaseProperties.units ).ToLower();
       // TODO: Check unit scales properly
-      switch ( units )
+      switch( units )
       {
         case "kilometers":
-          return 3.2808399 * 1000;
+        return 3.2808399 * 1000;
 
         case "meters":
-          return 3.2808399;
+        return 3.2808399;
 
         case "centimeters":
-          return 0.032808399;
+        return 0.032808399;
 
         case "millimiters":
-          return 0.0032808399;
+        return 0.0032808399;
 
         case "miles":
-          return 5280;
+        return 5280;
 
         case "feet":
-          return 1;
+        return 1;
 
         case "inches":
-          return 0.0833333;
+        return 0.0833333;
 
         default:
-          return 3.2808399;
+        return 3.2808399;
       };
     }
   }

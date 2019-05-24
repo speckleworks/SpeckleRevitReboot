@@ -172,6 +172,29 @@ namespace SpeckleRevit.UI
     }
 
     /// <summary>
+    /// Injects the unit dictionary to be used in parameter setting.
+    /// </summary>
+    /// <param name="dict"></param>
+    public void InjectUnitDictionaryInKits( Dictionary<string, string> dict )
+    {
+      var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+      foreach( var ass in assemblies )
+      {
+        var types = ass.GetTypes();
+        foreach( var type in types )
+        {
+          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          {
+            if( type.GetProperties().Select( p => p.Name ).Contains( "UnitDictionary" ) )
+            {
+              type.GetProperty( "UnitDictionary" ).SetValue( null, dict );
+            }
+          }
+        }
+      }
+    }
+
+    /// <summary>
     /// Gets from a speckle kit a "MissingFamiliesAndTypes" string hashset. This is populated during conversion to revit by the ToNative methods. This list is then sent to the UI.
     /// </summary>
     /// <returns></returns>
@@ -198,7 +221,31 @@ namespace SpeckleRevit.UI
           }
         }
       }
+      return null;
+    }
 
+    public object GetAndClearUnitDictionary()
+    {
+      var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+
+      foreach( var ass in assemblies )
+      {
+        var types = ass.GetTypes();
+        foreach( var type in types )
+        {
+          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          {
+            var typessss = type.GetProperties().Select( p => p.Name ).ToList();
+            if( type.GetProperties().Select( p => p.Name ).Contains( "UnitDictionary" ) )
+            {
+              var copy = new Dictionary<string, string>( (Dictionary<string, string>) type.GetProperty( "UnitDictionary" ).GetValue( type ) );
+              type.GetProperty( "UnitDictionary" ).SetValue( null, new Dictionary<string, string>() );
+
+              return copy;
+            }
+          }
+        }
+      }
       return null;
     }
 
@@ -443,17 +490,22 @@ namespace SpeckleRevit.UI
     public override void SelectClientObjects( string args )
     {
       var client = SNJ.JsonConvert.DeserializeObject<dynamic>( args );
-      var objIds = LocalState.Find( stream => stream.StreamId == (string) client.streamId ).Objects.Select(obj => (string) obj.Properties[ "revitUniqueId" ] );
+      var objIds = LocalState.Find( stream => stream.StreamId == (string) client.streamId ).Objects.Select( obj => (string) obj.Properties[ "revitUniqueId" ] ).ToList();
 
       Queue.Add( new Action( () =>
       {
         using( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Select" ) )
         {
           t.Start();
-          var objElIds = objIds.Select( obj => CurrentDoc.Document.GetElement( obj ).Id ).ToList();
-          var myUiDoc = new UIDocument( CurrentDoc.Document );
-          myUiDoc.Selection.SetElementIds( objElIds );
-          myUiDoc.ShowElements( objElIds );
+          if( objIds != null )
+          {
+            var objElIds = objIds.Select( obj => CurrentDoc.Document.GetElement( obj )?.Id ).Where( id => id != null ).ToList();
+            using( var myUiDoc = new UIDocument( CurrentDoc.Document ) )
+            {
+              myUiDoc.Selection.SetElementIds( objElIds );
+              myUiDoc.ShowElements( objElIds );
+            }
+          }
           t.Commit();
         }
       } ) );

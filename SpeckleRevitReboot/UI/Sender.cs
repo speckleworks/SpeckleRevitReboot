@@ -25,6 +25,9 @@ namespace SpeckleRevit.UI
       var convertedObjects = new List<SpeckleObject>();
       var placeholders = new List<SpeckleObject>();
 
+      var units = CurrentDoc.Document.GetUnits().GetFormatOptions( UnitType.UT_Length ).DisplayUnits.ToString().ToLower().Replace( "dut_", "" );
+      InjectScaleInKits( GetScale( units ) ); // this is used for feet to sane units conversion.
+
       int i = 0;
       long currentBucketSize = 0;
       var errors = "";
@@ -51,7 +54,6 @@ namespace SpeckleRevit.UI
 
           if( byteCount > 2e6 )
           {
-            // TODO: Handle fat objects
             var problemId = revitElement.Id;
           }
 
@@ -96,7 +98,7 @@ namespace SpeckleRevit.UI
         }
       }
 
-      if(failedConvert >0 ) errors += String.Format("Failed to convert a total of {0} objects. ", failedConvert);
+      if( failedConvert > 0 ) errors += String.Format( "Failed to convert a total of {0} objects. ", failedConvert );
       if( failedSend > 0 ) errors += String.Format( "Failed to send a total of {0} objects. ", failedSend );
 
       var myStream = new SpeckleStream() { Objects = placeholders };
@@ -104,11 +106,12 @@ namespace SpeckleRevit.UI
       var ug = UnitUtils.GetUnitGroup( UnitType.UT_Length );
       var baseProps = new Dictionary<string, object>();
 
-      // TODO: format units to something rational
-      baseProps[ "units" ] = CurrentDoc.Document.DisplayUnitSystem == DisplayUnit.IMPERIAL ? "imperial" : "meters";
-      baseProps[ "units_secondtry" ] = ug.ToString();
+      baseProps[ "units" ] = units;
+
+      baseProps[ "unitsDictionary" ] = GetAndClearUnitDictionary();
 
       myStream.BaseProperties = baseProps;
+      //myStream.BaseProperties = SNJ.JsonConvert.SerializeObject(baseProps);
 
       NotifyUi( "update-client", SNJ.JsonConvert.SerializeObject( new
       {
