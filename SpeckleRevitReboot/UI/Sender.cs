@@ -48,7 +48,7 @@ namespace SpeckleRevit.UI
         {
           var revitElement = CurrentDoc.Document.GetElement( (string) obj.properties[ "revitUniqueId" ] );
 
-          var conversionResult = SpeckleCore.Converter.Serialise( revitElement );
+          var conversionResult = SpeckleCore.Converter.Serialise( new List<object>() { revitElement } );
           var byteCount = Converter.getBytes( conversionResult ).Length;
           currentBucketSize += byteCount;
 
@@ -57,7 +57,7 @@ namespace SpeckleRevit.UI
             var problemId = revitElement.Id;
           }
 
-          convertedObjects.Add( conversionResult );
+          convertedObjects.AddRange( conversionResult );
 
           if( currentBucketSize > 5e5 || i >= client.objects.Count ) // aim for roughly 500kb uncompressed
           {
