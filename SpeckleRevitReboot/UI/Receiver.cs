@@ -273,7 +273,7 @@ namespace SpeckleRevit.UI
         case "centimeters":
         return 0.032808399;
 
-        case "millimiters":
+        case "millimeters":
         return 0.0032808399;
 
         case "miles":
