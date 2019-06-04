@@ -123,7 +123,7 @@ namespace SpeckleRevit.UI
             try
             {
 
-              res = SpeckleCore.Converter.Deserialise( mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
+              res = SpeckleCore.Converter.Deserialise( obj: mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
 
               // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
               // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
@@ -273,7 +273,7 @@ namespace SpeckleRevit.UI
         case "centimeters":
         return 0.032808399;
 
-        case "millimiters":
+        case "millimeters":
         return 0.0032808399;
 
         case "miles":
