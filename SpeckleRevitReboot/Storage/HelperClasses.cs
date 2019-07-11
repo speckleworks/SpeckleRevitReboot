@@ -1,12 +1,11 @@
-﻿extern alias SpeckleNewtonsoft;
-using SNJ = SpeckleNewtonsoft.Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
+using Newtonsoft.Json;
 
 namespace SpeckleRevit.Storage
 {
@@ -24,14 +23,14 @@ namespace SpeckleRevit.Storage
       var myList = new List<string>();
       foreach(dynamic el in clients)
       {
-        myList.Add( SNJ.JsonConvert.SerializeObject( el ) );
+        myList.Add( JsonConvert.SerializeObject( el ) );
       }
       return myList;
     }
 
     public void SetClients(IList<string> stringList)
     {
-      clients = stringList.Select( el => SNJ.JsonConvert.DeserializeObject<dynamic>( el ) ).ToList();
+      clients = stringList.Select( el => JsonConvert.DeserializeObject<dynamic>( el ) ).ToList();
     }
   }
 
