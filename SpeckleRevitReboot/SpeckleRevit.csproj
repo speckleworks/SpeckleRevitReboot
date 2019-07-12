@@ -94,6 +94,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -118,6 +119,8 @@
     <Compile Include="UI\SpeckleUiBindings.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\speckle16.png" />
+    <EmbeddedResource Include="Assets\speckle32.png" />
     <Content Include="SpeckleRevit.addin">
       <SubType>Designer</SubType>
     </Content>
@@ -131,6 +134,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--  <Target Name="BeforeBuild">
     <MakeDir Directories="$(TargetDir)\app" />
@@ -154,8 +158,8 @@
   </Target>
   <!-- End Web app copy -->
   <Target Name="AfterBuild">
-    <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit" />
-    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2019" />
+    <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2018\SpeckleRevit" />
+    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2018" />
     <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(SolutionDir)\$(ConfigurationName)" />
     <ItemGroup>
       <MySourceFiles Include="$(ProjectDir)bin\$(ConfigurationName)\**\*.*" />
@@ -166,7 +170,7 @@
     <ItemGroup>
       <AllMySourceFiles Include="$(SolutionDir)\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(AllMySourceFiles)" DestinationFiles="@(AllMySourceFiles->'$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit\%(RecursiveDir)%(Filename)%(Extension)')">
+    <Copy SourceFiles="@(AllMySourceFiles)" DestinationFiles="@(AllMySourceFiles->'$(AppData)\Autodesk\REVIT\Addins\2018\SpeckleRevit\%(RecursiveDir)%(Filename)%(Extension)')">
       <Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
     </Copy>
   </Target>
