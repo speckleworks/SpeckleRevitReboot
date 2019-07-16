@@ -121,8 +121,7 @@ namespace SpeckleRevit.UI
 
             try
             {
-
-              res = SpeckleCore.Converter.Deserialise( obj: mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
+              res = SpeckleCore.Converter.Deserialise( obj: mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit", "SpeckleElementsGSA" } );
 
               // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
               // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
