@@ -74,8 +74,8 @@
       <HintPath>..\packages\Revit.RevitApiUI.x64.2019.0.0\lib\net45\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SpeckleCore, Version=1.5.1.318, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\SpeckleCore.1.5.1.318\lib\net45\SpeckleCore.dll</HintPath>
+    <Reference Include="SpeckleCore, Version=1.5.1.326, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\SpeckleCore.1.5.1.326\lib\net45\SpeckleCore.dll</HintPath>
     </Reference>
     <Reference Include="SQLite-net, Version=1.5.231.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\sqlite-net-pcl.1.5.231\lib\netstandard1.1\SQLite-net.dll</HintPath>
@@ -158,8 +158,8 @@
   </Target>
   <!-- End Web app copy -->
   <Target Name="AfterBuild">
-    <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2018\SpeckleRevit" />
-    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2018" />
+    <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit" />
+    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2019" />
     <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(SolutionDir)\$(ConfigurationName)" />
     <ItemGroup>
       <MySourceFiles Include="$(ProjectDir)bin\$(ConfigurationName)\**\*.*" />
@@ -170,7 +170,7 @@
     <ItemGroup>
       <AllMySourceFiles Include="$(SolutionDir)\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(AllMySourceFiles)" DestinationFiles="@(AllMySourceFiles->'$(AppData)\Autodesk\REVIT\Addins\2018\SpeckleRevit\%(RecursiveDir)%(Filename)%(Extension)')">
+    <Copy SourceFiles="@(AllMySourceFiles)" DestinationFiles="@(AllMySourceFiles->'$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit\%(RecursiveDir)%(Filename)%(Extension)')">
       <Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
     </Copy>
   </Target>
