@@ -17,7 +17,7 @@ init:
         $spl = $tag.Split("-")[0]
         Update-AppveyorBuild -Version "$spl.$Env:APPVEYOR_BUILD_VERSION-wip"
       }
-      Write-Host "Hello. Build version is: $Env:APPVEYOR_BUILD_VERSION"
+      Write-Host "Hello. Build version for Speckle Revit is: $Env:APPVEYOR_BUILD_VERSION"
 
 install:
   # init and update submodules
