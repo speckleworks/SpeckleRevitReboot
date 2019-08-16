@@ -333,7 +333,7 @@ namespace SpeckleRevit.UI
               var client = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl.streamId == stream.StreamId );
               if( client != null )
               {
-                NotifyUi( "update-client", JsonConvert.SerializeObject( new
+                NotifyUi( "update-client",  JsonConvert.SerializeObject( new
                 {
                   _id = client._id,
                   expired = true,
@@ -347,7 +347,7 @@ namespace SpeckleRevit.UI
 
       if( !changed ) return;
 
-      NotifyUi( "appstate-expired", JsonConvert.SerializeObject( new
+      NotifyUi( "appstate-expired",  JsonConvert.SerializeObject( new
       {
         affectedStreams
       } ) );
@@ -370,7 +370,7 @@ namespace SpeckleRevit.UI
     #region client add/remove + serialisation/deserialisation
     public override void AddSender( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client =  JsonConvert.DeserializeObject<dynamic>( args );
       ClientListWrapper.clients.Add( client );
 
       // TODO: Add stream to LocalState (do we actually need to??? hm...).
@@ -407,7 +407,7 @@ namespace SpeckleRevit.UI
     /// <param name="args"></param>
     public override void AddReceiver( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client =  JsonConvert.DeserializeObject<dynamic>( args );
       ClientListWrapper.clients.Add( client );
 
       Queue.Add( new Action( () =>
@@ -428,7 +428,7 @@ namespace SpeckleRevit.UI
     /// <param name="args"></param>
     public override void RemoveClient( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client =  JsonConvert.DeserializeObject<dynamic>( args );
       var index = ClientListWrapper.clients.FindIndex( cl => cl.clientId == client.clientId );
 
       if( index == -1 ) return;
@@ -465,7 +465,7 @@ namespace SpeckleRevit.UI
       // Set them up in the class so we're aware of them
       ClientListWrapper = myReadClients;
 
-      return JsonConvert.SerializeObject( myReadClients.clients );
+      return  JsonConvert.SerializeObject( myReadClients.clients );
     }
 
     #endregion
@@ -488,7 +488,7 @@ namespace SpeckleRevit.UI
     /// <param name="args"></param>
     public override void SelectClientObjects( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client =  JsonConvert.DeserializeObject<dynamic>( args );
       var objIds = LocalState.Find( stream => stream.StreamId == (string) client.streamId ).Objects.Select( obj => (string) obj.Properties[ "revitUniqueId" ] ).ToList();
 
       Queue.Add( new Action( () =>
@@ -548,7 +548,7 @@ namespace SpeckleRevit.UI
     {
       List<dynamic> selectedObjects = new List<dynamic>();
 
-      if( CurrentDoc == null ) return JsonConvert.SerializeObject( selectedObjects ); ;
+      if( CurrentDoc == null ) return  JsonConvert.SerializeObject( selectedObjects ); ;
 
       var selectionIds = CurrentDoc.Selection.GetElementIds();
       foreach( var id in selectionIds )
@@ -571,7 +571,7 @@ namespace SpeckleRevit.UI
         } );
       }
 
-      return JsonConvert.SerializeObject( selectedObjects );
+      return  JsonConvert.SerializeObject( selectedObjects );
     }
 
     public List<ObjectSelectionFilter> GetFilters()

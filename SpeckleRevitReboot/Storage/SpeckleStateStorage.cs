@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Autodesk.Revit.Creation;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
-using Newtonsoft.Json;
 using SpeckleCore;
+using Newtonsoft.Json;
 
 namespace SpeckleRevit.Storage
 {
@@ -59,7 +59,7 @@ namespace SpeckleRevit.Storage
         return new List<SpeckleStream>();
 
       var serState = localStateEntity.Get<IList<string>>( "streams" );
-      var myState = serState.Select( str => JsonConvert.DeserializeObject<SpeckleStream>( str ) ).ToList();
+      var myState = serState.Select( str =>  JsonConvert.DeserializeObject<SpeckleStream>( str ) ).ToList();
 
       return myState != null ? myState : new List<SpeckleStream>();
     }
@@ -80,7 +80,7 @@ namespace SpeckleRevit.Storage
       }
       Entity speckleStateEntity = new Entity( SpeckleStateSchema.GetSchema() );
 
-      var ls = state.Select( stream => JsonConvert.SerializeObject( stream ) ).ToList();
+      var ls = state.Select( stream =>  JsonConvert.SerializeObject( stream ) ).ToList();
 
       speckleStateEntity.Set( "streams", ls as IList<string> );
 

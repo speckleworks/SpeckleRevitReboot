@@ -23,14 +23,14 @@ namespace SpeckleRevit.Storage
       var myList = new List<string>();
       foreach(dynamic el in clients)
       {
-        myList.Add( JsonConvert.SerializeObject( el ) );
+        myList.Add(  JsonConvert.SerializeObject( el ) );
       }
       return myList;
     }
 
     public void SetClients(IList<string> stringList)
     {
-      clients = stringList.Select( el => JsonConvert.DeserializeObject<dynamic>( el ) ).ToList();
+      clients = stringList.Select( el =>  JsonConvert.DeserializeObject<dynamic>( el ) ).ToList();
     }
   }
 

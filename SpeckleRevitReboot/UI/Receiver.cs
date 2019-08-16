@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
-using Newtonsoft.Json;
 using SpeckleCore;
+using Newtonsoft.Json;
 
 namespace SpeckleRevit.UI
 {
@@ -20,10 +20,10 @@ namespace SpeckleRevit.UI
     /// <param name="args">Serialised client coming from the ui.</param>
     public override void BakeReceiver( string args )
     {
-      var client = JsonConvert.DeserializeObject<dynamic>( args );
+      var client =  JsonConvert.DeserializeObject<dynamic>( args );
       var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      NotifyUi( "update-client",  JsonConvert.SerializeObject( new
       {
         _id = (string) client._id,
         loading = true,
@@ -37,7 +37,7 @@ namespace SpeckleRevit.UI
       var test = stream.BaseProperties.unitsDictionary;
       if( test != null )
       {
-        var secondTest = JsonConvert.DeserializeObject<Dictionary<string, string>>( JsonConvert.SerializeObject( test ) );
+        var secondTest =  JsonConvert.DeserializeObject<Dictionary<string, string>>(  JsonConvert.SerializeObject( test ) );
         InjectUnitDictionaryInKits( secondTest );
       }
       else InjectUnitDictionaryInKits( null ); // make sure it's not there to potentially muddy the waters on other conversions
@@ -62,7 +62,7 @@ namespace SpeckleRevit.UI
 
       var (toDelete, ToAddOrMod) = DiffStreamStates( previousStream, stream );
 
-      NotifyUi( "update-client", JsonConvert.SerializeObject( new
+      NotifyUi( "update-client",  JsonConvert.SerializeObject( new
       {
         _id = (string) client._id,
         loading = true,
@@ -101,7 +101,7 @@ namespace SpeckleRevit.UI
       {
         Queue.Add( new Action( () =>
         {
-          NotifyUi( "update-client", JsonConvert.SerializeObject( new
+          NotifyUi( "update-client",  JsonConvert.SerializeObject( new
           {
             _id = (string) client._id,
             loading = true,
@@ -121,7 +121,8 @@ namespace SpeckleRevit.UI
 
             try
             {
-              res = SpeckleCore.Converter.Deserialise( obj: mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit", "SpeckleElementsGSA" } );
+
+              res = SpeckleCore.Converter.Deserialise( obj: mySpkObj, excludeAssebmlies: new string[ ] { "SpeckleCoreGeometryDynamo", "SpeckleCoreGeometryRevit" } );
 
               // The converter returns either the converted object, or the original speckle object if it failed to deserialise it.
               // Hence, we need to create a shadow copy of the baked element only if deserialisation was succesful. 
@@ -178,7 +179,7 @@ namespace SpeckleRevit.UI
 
       Queue.Add( new Action( () =>
       {
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client",  JsonConvert.SerializeObject( new
         {
           _id = (string) client._id,
           loading = true,
@@ -218,7 +219,7 @@ namespace SpeckleRevit.UI
           errors += "</v-flex></v-layout>";
         }
 
-        NotifyUi( "update-client", JsonConvert.SerializeObject( new
+        NotifyUi( "update-client",  JsonConvert.SerializeObject( new
         {
           _id = (string) client._id,
           loading = false,

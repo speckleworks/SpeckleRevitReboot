@@ -23,6 +23,8 @@ The dream we've all been waiting for.
 
 ## Setting up for development & debugging from scratch
 
+**Please note, this instructions are now outdated. Get in touch on slack!** 
+
 These instructions might be incomplete. By all means, do submit a PR if something is wrong. 
 
 **Step 1:** Clone this repository, with its submodules. The solution file you're looking for is *SpeckleRevitWithElements*.
