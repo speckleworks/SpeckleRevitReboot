@@ -37,18 +37,17 @@ before_build:
   - mkdir Release
   # maybe needed for local build events to go through 
   - mkdir %localappdata%\Autodesk\REVIT\Addins\2019
+
 build:
   project: SpeckleRevit.sln
   verbosity: minimal
+
 after_build:
-  # zip everything up into a .rhi package
-  # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleRhinoPlugin\SpeckleWinR6\bin\Release\*"
-  # - 7z a -tzip -r specklerhino.rhi "%APPVEYOR_BUILD_FOLDER%\SpeckleGrasshopper\bin\Release\*"
   - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\Release\*"
  
 artifacts:
-  path: SpeckleRevit-$(APPVEYOR_BUILD_VERSION).zip
-  name: Release
+  path: SpeckleRevit.zip
+  name: SpeckleRevit
 
 deploy:
   - release: SpeckleRevit-$(APPVEYOR_BUILD_VERSION)
@@ -57,7 +56,7 @@ deploy:
     provider: GitHub
     auth_token:
       secure: D5tPFvdQMg9sIe0sSvQjEWw4KAdOk1jyxNwiH5qP5DpDmUH6n6NgTdA+56vXS1Pe # your encrypted token from GitHub
-    artifact: SpeckleRevit-$(APPVEYOR_BUILD_VERSION).rhi
+    artifact: SpeckleRevit
     #draft: false
     #prerelease: false
     force_update: true
