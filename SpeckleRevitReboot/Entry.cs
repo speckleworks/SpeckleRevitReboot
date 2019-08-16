@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -24,9 +28,37 @@ namespace SpeckleRevit
       var SpecklePanel = application.CreateRibbonPanel( "Speckle" );
       var SpeckleButton = SpecklePanel.AddItem( new PushButtonData( "Speckle", "Speckle Revit", typeof( SpecklePlugin ).Assembly.Location, "SpeckleRevit.SpeckleRevitCommand" ) ) as PushButton;
 
-      SpeckleButton.SetContextualHelp( new ContextualHelp( ContextualHelpType.Url, "https://speckle.works" ) );
+      if ( SpeckleButton != null )
+      {
+        string path = typeof( SpecklePlugin ).Assembly.Location;
+        SpeckleButton.Image = LoadPngImgSource( "SpeckleRevit.Assets.speckle16.png", path );
+        SpeckleButton.LargeImage = LoadPngImgSource( "SpeckleRevit.Assets.speckle32.png", path );
+        SpeckleButton.ToolTip = "Speckle";
+
+        SpeckleButton.SetContextualHelp( new ContextualHelp( ContextualHelpType.Url, "https://speckle.works" ) );
+      }
 
       return Result.Succeeded;
+    }
+
+    private ImageSource LoadPngImgSource( string sourceName, string path )
+    {
+      try
+      {
+        // Assembly & Stream
+        var assembly = Assembly.LoadFrom( Path.Combine( path ) );
+        var icon = assembly.GetManifestResourceStream( sourceName );
+
+        // Decoder
+        PngBitmapDecoder m_decoder = new PngBitmapDecoder( icon, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default );
+
+        // Source
+        ImageSource m_source = m_decoder.Frames[ 0 ];
+        return ( m_source );
+      }
+      catch { }
+      // Fail
+      return null;
     }
   }
 

@@ -125,6 +125,8 @@
     <Compile Include="UI\SpeckleUiBindings.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\speckle16.png" />
+    <EmbeddedResource Include="Assets\speckle32.png" />
     <Content Include="SpeckleRevit.addin">
       <SubType>Designer</SubType>
     </Content>
