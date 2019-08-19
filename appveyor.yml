@@ -47,7 +47,7 @@ after_build:
  
 artifacts:
   path: SpeckleRevit.zip
-  name: SpeckleRevit
+  name: release
 
 deploy:
   - release: SpeckleRevit-$(APPVEYOR_BUILD_VERSION)
@@ -56,7 +56,7 @@ deploy:
     provider: GitHub
     auth_token:
       secure: D5tPFvdQMg9sIe0sSvQjEWw4KAdOk1jyxNwiH5qP5DpDmUH6n6NgTdA+56vXS1Pe # your encrypted token from GitHub
-    artifact: SpeckleRevit
+    artifact: release
     #draft: false
     #prerelease: false
     force_update: true
