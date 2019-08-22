@@ -14,6 +14,8 @@ using Autodesk.Revit.UI;
 using SpeckleRevit.UI;
 using SpeckleUiBase;
 
+// IGNORE THIS COMMENT
+
 namespace SpeckleRevit
 {
   public class SpecklePlugin : IExternalApplication
