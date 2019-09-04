@@ -4,14 +4,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using SpeckleCore;
 using SpeckleRevit.Storage;
+using SpeckleUiBase;
 
 namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit
   {
+    public override void AddSender(string args)
+    {
+      var client = JsonConvert.DeserializeObject<dynamic>(args);
+      ClientListWrapper.clients.Add(client);
+
+      // TODO: Add stream to LocalState (do we actually need to??? hm...).
+      var myStream = new SpeckleStream() { StreamId = (string)client.streamId, Objects = new List<SpeckleObject>() };
+
+      //foreach( dynamic obj in client.objects )
+      //{
+      //  var SpkObj = new SpeckleObject() { };
+      //  SpkObj.Properties[ "revitUniqueId" ] = obj.id.ToString();
+      //  SpkObj.Properties[ "__type" ] = "Sent Object";
+      //  myStream.Objects.Add( SpkObj );
+      //}
+
+      LocalState.Add(myStream);
+
+      Queue.Add(new Action(() =>
+      {
+        using (Transaction t = new Transaction(CurrentDoc.Document, "Adding Speckle Sender"))
+        {
+          t.Start();
+          SpeckleStateManager.WriteState(CurrentDoc.Document, LocalState);
+          SpeckleClientsStorageManager.WriteClients(CurrentDoc.Document, ClientListWrapper);
+          t.Commit();
+        }
+      }));
+      Executor.Raise();
+
+      AddSelectionToSender(args);
+    }
+
+    // NOTE: This is actually triggered when clicking "Push!"
     // TODO: Orchestration
     // Create buckets, send sequentially, notify ui re upload progress
     // NOTE: Problems with local context and cache: we seem to not sucesffuly pass through it
@@ -19,6 +55,11 @@ namespace SpeckleRevit.UI
     public override void UpdateSender( string args )
     {
       var client =  JsonConvert.DeserializeObject<dynamic>( args );
+
+      var filterType = Type.GetType(client.filter.Type as string);
+      ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), filterType);
+      var objects = GetSelectionFilterObjects(filter);
+
       var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
       var convertedObjects = new List<SpeckleObject>();
@@ -32,15 +73,15 @@ namespace SpeckleRevit.UI
       var errors = "";
       var failedSend = 0;
       var failedConvert = 0;
-      foreach( var obj in client.objects )
+      foreach( var obj in objects)
       {
         NotifyUi( "update-client",  JsonConvert.SerializeObject( new
         {
           _id = (string) client._id,
           loading = true,
           isLoadingIndeterminate = false,
-          loadingProgress = 1f * i++ / client.objects.Count * 100,
-          loadingBlurb = string.Format( "Converting and uploading objects: {0} / {1}", i, client.objects.Count )
+          loadingProgress = 1f * i++ / objects.Count * 100,
+          loadingBlurb = string.Format( "Converting and uploading objects: {0} / {1}", i, objects.Count )
         } ) );
 
         try
@@ -58,7 +99,7 @@ namespace SpeckleRevit.UI
 
           convertedObjects.AddRange( conversionResult );
 
-          if( currentBucketSize > 5e5 || i >= client.objects.Count ) // aim for roughly 500kb uncompressed
+          if( currentBucketSize > 5e5 || i >= objects.Count ) // aim for roughly 500kb uncompressed
           {
             LocalContext.PruneExistingObjects( convertedObjects, apiClient.BaseUrl );
 
@@ -226,5 +267,61 @@ namespace SpeckleRevit.UI
           message = String.Format( "You have removed {0} objects from this sender.", removed )
         } ) );
     }
+
+    #region private methods
+
+    
+
+    /// <summary>
+    /// Given the filter in use by a stream returns the document elements that match it
+    /// </summary>
+    /// <returns></returns>
+    private List<dynamic> GetSelectionFilterObjects(UIDocument CurrentDoc, ISelectionFilter filter)
+    {
+      var objects = new List<dynamic>();
+
+      var selectionIds = new List<string>();
+
+      if (filter.Name == "Selection")
+      {
+        selectionIds = CurrentDoc.Selection.GetElementIds().Select(id => CurrentDoc.Document.GetElement(id).UniqueId).ToList();
+      }
+      else if (filter.Name == "Category")
+      {
+        var catFilter = filter as ListSelectionFilter;
+        var bics = new List<BuiltInCategory>();
+        var categories = Globals.GetCategories(CurrentDoc.Document);
+        IList<ElementFilter> elementFilters = new List<ElementFilter>();
+
+        foreach (var cat in catFilter.Selection)
+        {
+          elementFilters.Add(new ElementCategoryFilter(categories[cat].Id));
+        }
+        LogicalOrFilter categoryFilter = new LogicalOrFilter(elementFilters);
+
+        selectionIds = new FilteredElementCollector(CurrentDoc.Document).WherePasses(categoryFilter).ToElements().Select(x=>x.UniqueId).ToList();
+
+      }
+      else if (filter.Name == "Property")
+      {
+
+      }
+
+
+
+      // LOCAL STATE management
+      var spkObjectsToAdd = selectionIds.Select(id =>
+      {
+        var temp = new SpeckleObject();
+        temp.Properties["revitUniqueId"] = id;
+        temp.Properties["__type"] = "Sent Object";
+        return temp;
+      });
+
+
+      return objects;
+    }
+    #endregion
+
   }
 }
