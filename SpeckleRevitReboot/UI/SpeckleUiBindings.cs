@@ -575,8 +575,8 @@ namespace SpeckleRevit.UI
           HasCustomProperty = true,
           Values = new List<string>
           {
-            "Family Name",
-            "Family Type"
+            "Family",
+            "Family and Type"
           }
         }
       };

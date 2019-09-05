@@ -84,8 +84,8 @@ namespace SpeckleRevit
         bindings.SetExecutorAndInit( eventHandler );
 
         // Initialise the window
-#if DEBUGLOCAL
-        SpeckleWindow = new SpeckleUiWindow( bindings, @"http://10.211.55.2:8080/#/" );
+#if DEBUG
+        SpeckleWindow = new SpeckleUiWindow( bindings, @"http://localhost:8080/" );
 #else
         SpeckleWindow = new SpeckleUiWindow( bindings ); // On release, default to the latest ci-ed version from https://appui.speckle.systems
 #endif
