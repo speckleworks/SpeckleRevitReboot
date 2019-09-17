@@ -296,14 +296,42 @@ namespace SpeckleRevit.UI
           .Select(x=>x.UniqueId).ToList();
 
       }
-      else if (filter.Name == "Property")
+      else if (filter.Name == "Parameter")
       {
         try
         {
           var propFilter = filter as PropertySelectionFilter;
-          selectionIds = new FilteredElementCollector(doc)
+          var query = new FilteredElementCollector(doc)
             .WhereElementIsNotElementType()
-            .Where(fi => fi.LookupParameter(propFilter.PropertyName) !=null && fi.LookupParameter(propFilter.PropertyName).AsValueString() == propFilter.PropertyValue).Select(x => x.UniqueId).ToList();
+            .Where(fi => fi.LookupParameter(propFilter.PropertyName) != null);
+
+          
+
+
+          switch (propFilter.PropertyOperator)
+          {
+            case "equals":
+              query = query.Where(fi => fi.LookupParameter(propFilter.PropertyName).AsValueString() == propFilter.PropertyValue);
+              break;
+            case "contains":
+              query = query.Where(fi => fi.LookupParameter(propFilter.PropertyName).AsValueString().Contains(propFilter.PropertyValue));
+              break;
+            case "is greater than":
+              query = query.Where(fi => UnitUtils.ConvertFromInternalUnits(
+                fi.LookupParameter(propFilter.PropertyName).AsDouble(), 
+                fi.LookupParameter(propFilter.PropertyName).DisplayUnitType) > double.Parse(propFilter.PropertyValue));
+              break;
+            case "is less than":
+              query = query.Where(fi => UnitUtils.ConvertFromInternalUnits(
+               fi.LookupParameter(propFilter.PropertyName).AsDouble(),
+               fi.LookupParameter(propFilter.PropertyName).DisplayUnitType) < double.Parse(propFilter.PropertyValue));
+              break;
+            default:
+              break;
+          }
+
+          selectionIds = query.Select(x => x.UniqueId).ToList();
+
         }
         catch { }
       }

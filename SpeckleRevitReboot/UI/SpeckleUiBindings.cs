@@ -368,7 +368,7 @@ namespace SpeckleRevit.UI
     #endregion
 
     #region client add/remove + serialisation/deserialisation
-   
+
 
     /// <summary>
     /// Adds a client receiver. Does not "bake" it.
@@ -547,10 +547,12 @@ namespace SpeckleRevit.UI
     {
       var selectionCount = 0;
       var categories = new List<string>();
+      var parameters = new List<string>();
       if (CurrentDoc != null)
       {
         selectionCount = CurrentDoc.Selection.GetElementIds().Count();
         categories = Globals.GetCategoryNames(CurrentDoc.Document);
+        parameters = Globals.GetParameterNames(CurrentDoc.Document);
       }
 
 
@@ -570,13 +572,17 @@ namespace SpeckleRevit.UI
         },
         new PropertySelectionFilter
         {
-          Name = "Property",
+          Name = "Parameter",
           Icon = "filter_list",
-          HasCustomProperty = true,
-          Values = new List<string>
+          HasCustomProperty = false,
+          Values = parameters,
+          Operators = new List<string>
           {
-            "Family",
-            "Family and Type"
+            "equals",
+            "contains",
+            "is greater than",
+            "is less than"
+
           }
         }
       };

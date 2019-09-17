@@ -30,5 +30,26 @@ namespace SpeckleRevit
       return GetCategories(doc).Keys.OrderBy(x => x).ToList();
     }
 
+    public static List<string> GetParameterNames(Document doc)
+    {
+      var els = new FilteredElementCollector(doc)
+      .WhereElementIsNotElementType()
+      .WhereElementIsViewIndependent()
+      .ToElements();
+
+      List<string> parameters = new List<string>();
+
+      foreach(var e in els)
+      {
+        foreach (Parameter p in e.Parameters)
+        {
+          if (!parameters.Contains(p.Definition.Name))
+            parameters.Add(p.Definition.Name);
+        }
+      }
+      parameters = parameters.OrderBy(x => x).ToList();
+      return parameters;
+    }
+
   }
 }

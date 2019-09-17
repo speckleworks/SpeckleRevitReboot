@@ -87,7 +87,7 @@ namespace SpeckleRevit
 #if DEBUG
         SpeckleWindow = new SpeckleUiWindow( bindings, @"http://localhost:8080/" );
 #else
-        SpeckleWindow = new SpeckleUiWindow( bindings ); // On release, default to the latest ci-ed version from https://appui.speckle.systems
+        SpeckleWindow = new SpeckleUiWindow( bindings, @"https://matteo-dev.appui.speckle.systems/#/" ); // On release, default to the latest ci-ed version from https://appui.speckle.systems
 #endif
         var helper = new System.Windows.Interop.WindowInteropHelper( SpeckleWindow );
         helper.Owner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
