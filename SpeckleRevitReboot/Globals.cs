@@ -37,6 +37,7 @@ namespace SpeckleRevit
       var els = new FilteredElementCollector(doc)
         .WhereElementIsNotElementType()
         .WhereElementIsViewIndependent()
+        .OfClass(typeof(FamilyInstance))
         .ToElements();
 
       List<string> parameters = new List<string>();

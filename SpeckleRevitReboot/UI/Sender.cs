@@ -88,10 +88,8 @@ namespace SpeckleRevit.UI
       //if it's a selection filter just use the objects that were stored previously
       ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), GetFilterType(client.filter.Type.ToString()));
       IEnumerable<SpeckleObject> objects = new List<SpeckleObject>();
-      if (filter.Name != "Selection")
-        objects = GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
-      else
-        objects = client.objects;
+
+      objects = GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
 
       var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
 
@@ -196,11 +194,13 @@ namespace SpeckleRevit.UI
 
       var response = apiClient.StreamUpdateAsync( (string) client.streamId, myStream ).Result;
 
+      var plural = objects.Count() == 1 ? "" : "s";
       NotifyUi( "update-client",  JsonConvert.SerializeObject( new
       {
         _id = (string) client._id,
         loading = false,
-        loadingBlurb = "Done sending.",
+        loadingBlurb = "",
+        message = $"Done sending {objects.Count()} object{plural}.",
         errors
       } ) );
 
@@ -286,7 +286,7 @@ namespace SpeckleRevit.UI
 
       if (filter.Name == "Selection")
       {
-        var selFilter = filter as ListSelectionFilter;
+        var selFilter = filter as ElementsSelectionFilter;
         selectionIds = selFilter.Selection;
       }
       else if (filter.Name == "Category")
@@ -385,7 +385,7 @@ namespace SpeckleRevit.UI
           _id = clientId,
           expired = true,
           objects = myClient.objects,
-          message = $"You have added {objects.Count()} object{plural} to this sender."
+          //message = $"You have added {objects.Count()} object{plural} to this sender."
         }));
 
       return objects;
