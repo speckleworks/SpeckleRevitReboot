@@ -9,6 +9,8 @@ namespace SpeckleRevit
 {
   public static class Globals
   {
+    private static List<string> _cachedParameters = null;
+
 
     private static Dictionary<string, Category> _categories { get; set; }
 
@@ -30,16 +32,16 @@ namespace SpeckleRevit
       return GetCategories(doc).Keys.OrderBy(x => x).ToList();
     }
 
-    public static List<string> GetParameterNames(Document doc)
+    private async static Task<List<string>> GetParameterNamesAsync(Document doc)
     {
       var els = new FilteredElementCollector(doc)
-      .WhereElementIsNotElementType()
-      .WhereElementIsViewIndependent()
-      .ToElements();
+        .WhereElementIsNotElementType()
+        .WhereElementIsViewIndependent()
+        .ToElements();
 
       List<string> parameters = new List<string>();
 
-      foreach(var e in els)
+      foreach (var e in els)
       {
         foreach (Parameter p in e.Parameters)
         {
@@ -47,8 +49,25 @@ namespace SpeckleRevit
             parameters.Add(p.Definition.Name);
         }
       }
-      parameters = parameters.OrderBy(x => x).ToList();
-      return parameters;
+      _cachedParameters = parameters.OrderBy(x => x).ToList();
+      return _cachedParameters;
+    }
+
+    /// <summary>
+    /// Each time it's called the cached parameters are return, and a new copy is cached
+    /// </summary>
+    /// <param name="doc"></param>
+    /// <returns></returns>
+    public static List<string> GetParameterNames(Document doc)
+    {
+      if (_cachedParameters != null)
+      {
+        //don't wait for it to finish
+        GetParameterNamesAsync(doc);
+        return _cachedParameters;
+      }
+      return GetParameterNamesAsync(doc).Result;
+
     }
 
   }

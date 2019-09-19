@@ -45,7 +45,9 @@ namespace SpeckleRevit.UI
       }));
       Executor.Raise();
 
-      AddSelectionToSender(args);
+
+      ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), GetFilterType(client.filter.Type.ToString()));
+      GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
     }
 
     public override void UpdateSender(string args)
@@ -69,7 +71,8 @@ namespace SpeckleRevit.UI
       }));
       Executor.Raise();
 
-      AddSelectionToSender(args);
+      ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), GetFilterType(client.filter.Type.ToString()));
+      GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
     }
 
     // NOTE: This is actually triggered when clicking "Push!"
@@ -203,17 +206,25 @@ namespace SpeckleRevit.UI
 
     }
 
+    /// <summary>
+    /// Pass selected element ids to UI
+    /// </summary>
+    /// <param name="args"></param>
     public override void AddSelectionToSender( string args )
     {
-      var client =  JsonConvert.DeserializeObject<dynamic>( args );
-      
-      ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), GetFilterType(client.filter.Type.ToString()));
+      var doc = CurrentDoc.Document;
+      var selectedObjects = CurrentDoc != null ?  CurrentDoc.Selection.GetElementIds().Select(id => doc.GetElement(id).UniqueId).ToList() : new List<string>();
 
-      GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
+      NotifyUi("update-selection", JsonConvert.SerializeObject(new
+      {
+        selectedObjects
+      }));
     }
 
     public override void RemoveSelectionFromSender( string args )
     {
+      // NOT IMPLEMENTED
+
       //var client =  JsonConvert.DeserializeObject<dynamic>( args );
       //var myStream = LocalState.FirstOrDefault( st => st.StreamId == (string) client.streamId );
       //var myClient = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl._id == (string) client._id );
@@ -275,7 +286,8 @@ namespace SpeckleRevit.UI
 
       if (filter.Name == "Selection")
       {
-        selectionIds = CurrentDoc.Selection.GetElementIds().Select(id => doc.GetElement(id).UniqueId).ToList();
+        var selFilter = filter as ListSelectionFilter;
+        selectionIds = selFilter.Selection;
       }
       else if (filter.Name == "Category")
       {

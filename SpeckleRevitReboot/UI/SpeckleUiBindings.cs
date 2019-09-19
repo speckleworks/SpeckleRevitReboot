@@ -513,44 +513,43 @@ namespace SpeckleRevit.UI
 
     #region sender 
 
-    public string GetObjectSelection()
-    {
-      List<dynamic> selectedObjects = new List<dynamic>();
+    //public string GetObjectSelection()
+    //{
+    //  List<dynamic> selectedObjects = new List<dynamic>();
 
-      if (CurrentDoc == null) return JsonConvert.SerializeObject(selectedObjects); ;
+    //  if (CurrentDoc == null) return JsonConvert.SerializeObject(selectedObjects); ;
 
-      var selectionIds = CurrentDoc.Selection.GetElementIds();
-      foreach (var id in selectionIds)
-      {
-        var elm = CurrentDoc.Document.GetElement(id);
-        var cat = elm.Category;
-        var typ = elm.GetType();
-        var isFam = elm is FamilyInstance;
+    //  var selectionIds = CurrentDoc.Selection.GetElementIds();
+    //  foreach (var id in selectionIds)
+    //  {
+    //    var elm = CurrentDoc.Document.GetElement(id);
+    //    var cat = elm.Category;
+    //    var typ = elm.GetType();
+    //    var isFam = elm is FamilyInstance;
 
-        if (isFam)
-        {
-          var fam = (elm as FamilyInstance).Symbol.FamilyName;
-        }
+    //    if (isFam)
+    //    {
+    //      var fam = (elm as FamilyInstance).Symbol.FamilyName;
+    //    }
 
-        selectedObjects.Add(new
-        {
-          id = elm.UniqueId.ToString(),
-          type = typ.Name,
-          cat = cat.Name
-        });
-      }
+    //    selectedObjects.Add(new
+    //    {
+    //      id = elm.UniqueId.ToString(),
+    //      type = typ.Name,
+    //      cat = cat.Name
+    //    });
+    //  }
 
-      return JsonConvert.SerializeObject(selectedObjects);
-    }
+    //  return JsonConvert.SerializeObject(selectedObjects);
+    //}
 
     public override List<ISelectionFilter> GetSelectionFilters()
     {
-      var selectionCount = 0;
       var categories = new List<string>();
       var parameters = new List<string>();
       if (CurrentDoc != null)
       {
-        selectionCount = CurrentDoc.Selection.GetElementIds().Count();
+        //selectionCount = CurrentDoc.Selection.GetElementIds().Count();
         categories = Globals.GetCategoryNames(CurrentDoc.Document);
         parameters = Globals.GetParameterNames(CurrentDoc.Document);
       }
@@ -562,7 +561,7 @@ namespace SpeckleRevit.UI
         {
           Name = "Selection",
           Icon = "mouse",
-          Count = selectionCount
+          Selection = new List<string>()
         },
         new ListSelectionFilter
         {
@@ -582,7 +581,6 @@ namespace SpeckleRevit.UI
             "contains",
             "is greater than",
             "is less than"
-
           }
         }
       };
