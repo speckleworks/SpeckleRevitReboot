@@ -39,7 +39,7 @@ namespace SpeckleRevit.UI
 
     public List<SpeckleStream> LocalState;
 
-    public SpeckleUiBindingsRevit( UIApplication _RevitApp ) : base()
+    public SpeckleUiBindingsRevit(UIApplication _RevitApp) : base()
     {
       RevitApp = _RevitApp;
       Queue = new List<Action>();
@@ -50,22 +50,22 @@ namespace SpeckleRevit.UI
     /// Sets the revit external event handler and intialises the rocket enginges.
     /// </summary>
     /// <param name="eventHandler"></param>
-    public void SetExecutorAndInit( ExternalEvent eventHandler )
+    public void SetExecutorAndInit(ExternalEvent eventHandler)
     {
       Executor = eventHandler;
 
       // LOCAL STATE
       LocalState = new List<SpeckleStream>();
-      Queue.Add( new Action( () =>
+      Queue.Add(new Action(() =>
+    {
+      using (Transaction t = new Transaction(CurrentDoc.Document, "Switching Local Speckle State"))
       {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
-        {
-          t.Start();
-          LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
-          InjectStateInKits();
-          t.Commit();
-        }
-      } ) );
+        t.Start();
+        LocalState = SpeckleStateManager.ReadState(CurrentDoc.Document);
+        InjectStateInKits();
+        t.Commit();
+      }
+    }));
       Executor.Raise();
 
       // REVIT INJECTION
@@ -79,25 +79,25 @@ namespace SpeckleRevit.UI
       RevitApp.Idling += ApplicationIdling;
 
 
-      SelectionTimer = new Timer( 1400 ) { AutoReset = true, Enabled = true };
+      SelectionTimer = new Timer(1400) { AutoReset = true, Enabled = true };
       SelectionTimer.Elapsed += SelectionTimer_Elapsed;
       // TODO: Find a way to handle when document is closed via middle mouse click
       // thus triggering the focus on a new project
 
     }
 
-    private void SelectionTimer_Elapsed( object sender, ElapsedEventArgs e )
+    private void SelectionTimer_Elapsed(object sender, ElapsedEventArgs e)
     {
-      if( CurrentDoc == null ) return;
+      if (CurrentDoc == null) return;
       var selectedObjectsCount = CurrentDoc != null ? CurrentDoc.Selection.GetElementIds().Count : 0;
 
-      NotifyUi( "update-selection-count", JsonConvert.SerializeObject( new
+      NotifyUi("update-selection-count", JsonConvert.SerializeObject(new
       {
         selectedObjectsCount
-      } ) );
+      }));
     }
 
-    private void ApplicationIdling( object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e )
+    private void ApplicationIdling(object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e)
     {
     }
 
@@ -109,16 +109,16 @@ namespace SpeckleRevit.UI
     public void InjectRevitAppInKits()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach( var ass in assemblies )
+      foreach (var ass in assemblies)
       {
         var types = ass.GetTypes();
-        foreach( var type in types )
+        foreach (var type in types)
         {
-          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
-            if( type.GetProperties().Select( p => p.Name ).Contains( "RevitApp" ) )
+            if (type.GetProperties().Select(p => p.Name).Contains("RevitApp"))
             {
-              type.GetProperty( "RevitApp" ).SetValue( null, RevitApp );
+              type.GetProperty("RevitApp").SetValue(null, RevitApp);
             }
           }
         }
@@ -132,16 +132,16 @@ namespace SpeckleRevit.UI
     public void InjectStateInKits()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach( var ass in assemblies )
+      foreach (var ass in assemblies)
       {
         var types = ass.GetTypes();
-        foreach( var type in types )
+        foreach (var type in types)
         {
-          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
-            if( type.GetProperties().Select( p => p.Name ).Contains( "LocalRevitState" ) )
+            if (type.GetProperties().Select(p => p.Name).Contains("LocalRevitState"))
             {
-              type.GetProperty( "LocalRevitState" ).SetValue( null, LocalState );
+              type.GetProperty("LocalRevitState").SetValue(null, LocalState);
             }
           }
         }
@@ -151,19 +151,19 @@ namespace SpeckleRevit.UI
     /// <summary>
     /// Injects a scale property to be used in conversion methods if needed.
     /// </summary>
-    public void InjectScaleInKits( double scale )
+    public void InjectScaleInKits(double scale)
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach( var ass in assemblies )
+      foreach (var ass in assemblies)
       {
         var types = ass.GetTypes();
-        foreach( var type in types )
+        foreach (var type in types)
         {
-          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
-            if( type.GetProperties().Select( p => p.Name ).Contains( "RevitScale" ) )
+            if (type.GetProperties().Select(p => p.Name).Contains("RevitScale"))
             {
-              type.GetProperty( "RevitScale" ).SetValue( null, scale );
+              type.GetProperty("RevitScale").SetValue(null, scale);
             }
           }
         }
@@ -174,19 +174,19 @@ namespace SpeckleRevit.UI
     /// Injects the unit dictionary to be used in parameter setting.
     /// </summary>
     /// <param name="dict"></param>
-    public void InjectUnitDictionaryInKits( Dictionary<string, string> dict )
+    public void InjectUnitDictionaryInKits(Dictionary<string, string> dict)
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach( var ass in assemblies )
+      foreach (var ass in assemblies)
       {
         var types = ass.GetTypes();
-        foreach( var type in types )
+        foreach (var type in types)
         {
-          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
-            if( type.GetProperties().Select( p => p.Name ).Contains( "UnitDictionary" ) )
+            if (type.GetProperties().Select(p => p.Name).Contains("UnitDictionary"))
             {
-              type.GetProperty( "UnitDictionary" ).SetValue( null, dict );
+              type.GetProperty("UnitDictionary").SetValue(null, dict);
             }
           }
         }
@@ -200,20 +200,20 @@ namespace SpeckleRevit.UI
     public List<string> GetAndClearMissingFamilies()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
-      foreach( var ass in assemblies )
+      foreach (var ass in assemblies)
       {
         var types = ass.GetTypes();
-        foreach( var type in types )
+        foreach (var type in types)
         {
-          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
-            var typessss = type.GetProperties().Select( p => p.Name ).ToList();
-            if( type.GetProperties().Select( p => p.Name ).Contains( "MissingFamiliesAndTypes" ) )
+            var typessss = type.GetProperties().Select(p => p.Name).ToList();
+            if (type.GetProperties().Select(p => p.Name).Contains("MissingFamiliesAndTypes"))
             {
-              var missingSet = type.GetProperty( "MissingFamiliesAndTypes" ).GetValue( type );
-              var missingList = ((HashSet<string>) missingSet).ToList();
+              var missingSet = type.GetProperty("MissingFamiliesAndTypes").GetValue(type);
+              var missingList = ((HashSet<string>)missingSet).ToList();
 
-              type.GetProperty( "MissingFamiliesAndTypes" ).SetValue( null, new HashSet<string>() );
+              type.GetProperty("MissingFamiliesAndTypes").SetValue(null, new HashSet<string>());
 
               return missingList;
             }
@@ -227,18 +227,18 @@ namespace SpeckleRevit.UI
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
 
-      foreach( var ass in assemblies )
+      foreach (var ass in assemblies)
       {
         var types = ass.GetTypes();
-        foreach( var type in types )
+        foreach (var type in types)
         {
-          if( type.GetInterfaces().Contains( typeof( SpeckleCore.ISpeckleInitializer ) ) )
+          if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
-            var typessss = type.GetProperties().Select( p => p.Name ).ToList();
-            if( type.GetProperties().Select( p => p.Name ).Contains( "UnitDictionary" ) )
+            var typessss = type.GetProperties().Select(p => p.Name).ToList();
+            if (type.GetProperties().Select(p => p.Name).Contains("UnitDictionary"))
             {
-              var copy = new Dictionary<string, string>( (Dictionary<string, string>) type.GetProperty( "UnitDictionary" ).GetValue( type ) );
-              type.GetProperty( "UnitDictionary" ).SetValue( null, new Dictionary<string, string>() );
+              var copy = new Dictionary<string, string>((Dictionary<string, string>)type.GetProperty("UnitDictionary").GetValue(type));
+              type.GetProperty("UnitDictionary").SetValue(null, new Dictionary<string, string>());
 
               return copy;
             }
@@ -248,119 +248,119 @@ namespace SpeckleRevit.UI
       return null;
     }
 
-    public void ExecuteAction( Action a )
+    public void ExecuteAction(Action a)
     {
-      Queue.Add( a );
+      Queue.Add(a);
       Executor.Raise();
     }
 
     #endregion
 
     #region app events
-    private void RevitApp_ViewActivated( object sender, Autodesk.Revit.UI.Events.ViewActivatedEventArgs e )
+    private void RevitApp_ViewActivated(object sender, Autodesk.Revit.UI.Events.ViewActivatedEventArgs e)
     {
-      if( GetDocHash( e.Document ) != GetDocHash( e.PreviousActiveView.Document ) )
+      if (GetDocHash(e.Document) != GetDocHash(e.PreviousActiveView.Document))
       {
-        DispatchStoreActionUi( "flushClients" );
-        DispatchStoreActionUi( "getExistingClients" );
+        DispatchStoreActionUi("flushClients");
+        DispatchStoreActionUi("getExistingClients");
 
-        Queue.Add( new Action( () =>
+        Queue.Add(new Action(() =>
+      {
+        using (Transaction t = new Transaction(CurrentDoc.Document, "Switching Local Speckle State"))
         {
-          using( Transaction t = new Transaction( CurrentDoc.Document, "Switching Local Speckle State" ) )
-          {
-            t.Start();
-            LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
-            InjectStateInKits();
-            t.Commit();
-          }
-        } ) );
+          t.Start();
+          LocalState = SpeckleStateManager.ReadState(CurrentDoc.Document);
+          InjectStateInKits();
+          t.Commit();
+        }
+      }));
         Executor.Raise();
       }
     }
 
-    private void Application_DocumentClosed( object sender, Autodesk.Revit.DB.Events.DocumentClosedEventArgs e )
+    private void Application_DocumentClosed(object sender, Autodesk.Revit.DB.Events.DocumentClosedEventArgs e)
     {
-      DispatchStoreActionUi( "flushClients" );
+      DispatchStoreActionUi("flushClients");
     }
 
-    private void Application_DocumentOpened( object sender, Autodesk.Revit.DB.Events.DocumentOpenedEventArgs e )
+    private void Application_DocumentOpened(object sender, Autodesk.Revit.DB.Events.DocumentOpenedEventArgs e)
     {
-      DispatchStoreActionUi( "flushClients" );
-      DispatchStoreActionUi( "getExistingClients" );
+      DispatchStoreActionUi("flushClients");
+      DispatchStoreActionUi("getExistingClients");
 
-      Queue.Add( new Action( () =>
+      Queue.Add(new Action(() =>
+    {
+      using (Transaction t = new Transaction(CurrentDoc.Document, "Reading Local Speckle State"))
       {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Reading Local Speckle State" ) )
-        {
-          t.Start();
-          LocalState = SpeckleStateManager.ReadState( CurrentDoc.Document );
-          InjectStateInKits();
-          t.Commit();
-        }
-      } ) );
+        t.Start();
+        LocalState = SpeckleStateManager.ReadState(CurrentDoc.Document);
+        InjectStateInKits();
+        t.Commit();
+      }
+    }));
       Executor.Raise();
     }
 
     // TODO: Handler for detecting changes in the sender
     // TODO: Mark received objects as modified in local state (x)
-    private void Application_DocumentChanged( object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e )
+    private void Application_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
     {
       var transactionNames = e.GetTransactionNames();
-      var foundKnownTransaction = transactionNames.FirstOrDefault( str => str.Contains( "Speckle" ) );
-      if( foundKnownTransaction != null ) return;
+      var foundKnownTransaction = transactionNames.FirstOrDefault(str => str.Contains("Speckle"));
+      if (foundKnownTransaction != null) return;
       //if ( transactionNames.Contains( "Speckle Bake" ) || transactionNames.Contains( "Speckle Delete" ) ) return;
 
       // TODO: Notify ui that application state now differs from stream state.
       // Will require a iterating by stream rather than grouped "allStateObjects"
       var modified = e.GetModifiedElementIds();
-      var modifiedUniqueIds = modified.Select( id => CurrentDoc.Document.GetElement( id ).UniqueId );
-      var allStateObjects = (from p in LocalState.SelectMany( s => s.Objects ) select p).ToList();
+      var modifiedUniqueIds = modified.Select(id => CurrentDoc.Document.GetElement(id).UniqueId);
+      var allStateObjects = (from p in LocalState.SelectMany(s => s.Objects) select p).ToList();
       var changed = false;
 
       var affectedStreams = new HashSet<string>();
       var affectedClients = new List<string>();
-      foreach( var stream in LocalState )
+      foreach (var stream in LocalState)
       {
-        foreach( var id in modifiedUniqueIds )
+        foreach (var id in modifiedUniqueIds)
         {
-          var found = stream.Objects.FirstOrDefault( o => (String) o.Properties[ "revitUniqueId" ] == id );
-          if( found != null )
+          var found = stream.Objects.FirstOrDefault(o => (String)o.Properties["revitUniqueId"] == id);
+          if (found != null)
           {
-            found.Properties[ "userModified" ] = true;
+            found.Properties["userModified"] = true;
             changed = true;
-            if( affectedStreams.Add( stream.StreamId ) )
+            if (affectedStreams.Add(stream.StreamId))
             {
-              var client = ClientListWrapper.clients.FirstOrDefault( cl => (string) cl.streamId == stream.StreamId );
-              if( client != null )
+              var client = ClientListWrapper.clients.FirstOrDefault(cl => (string)cl.streamId == stream.StreamId);
+              if (client != null)
               {
-                NotifyUi( "update-client",  JsonConvert.SerializeObject( new
+                NotifyUi("update-client", JsonConvert.SerializeObject(new
                 {
                   _id = client._id,
                   expired = true,
                   message = "The stream state and the application state do not match."
-                } ) );
+                }));
               }
             }
           }
         }
       }
 
-      if( !changed ) return;
+      if (!changed) return;
 
-      NotifyUi( "appstate-expired",  JsonConvert.SerializeObject( new
+      NotifyUi("appstate-expired", JsonConvert.SerializeObject(new
       {
         affectedStreams
-      } ) );
+      }));
 
-      Queue.Add( new Action( () =>
+      Queue.Add(new Action(() =>
+    {
+      using (Transaction t = new Transaction(CurrentDoc.Document, "Writing Local Speckle State"))
       {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Writing Local Speckle State" ) )
-        {
-          t.Start();
-          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
-          t.Commit();
-        }
-      } ) );
+        t.Start();
+        SpeckleStateManager.WriteState(CurrentDoc.Document, LocalState);
+        t.Commit();
+      }
+    }));
       Executor.Raise();
 
     }
@@ -368,57 +368,26 @@ namespace SpeckleRevit.UI
     #endregion
 
     #region client add/remove + serialisation/deserialisation
-    public override void AddSender( string args )
-    {
-      var client =  JsonConvert.DeserializeObject<dynamic>( args );
-      ClientListWrapper.clients.Add( client );
 
-      // TODO: Add stream to LocalState (do we actually need to??? hm...).
-      var myStream = new SpeckleStream() { StreamId = (string) client.streamId, Objects = new List<SpeckleObject>() };
-
-      //foreach( dynamic obj in client.objects )
-      //{
-      //  var SpkObj = new SpeckleObject() { };
-      //  SpkObj.Properties[ "revitUniqueId" ] = obj.id.ToString();
-      //  SpkObj.Properties[ "__type" ] = "Sent Object";
-      //  myStream.Objects.Add( SpkObj );
-      //}
-
-      LocalState.Add( myStream );
-
-      Queue.Add( new Action( () =>
-      {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
-        {
-          t.Start();
-          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
-          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
-          t.Commit();
-        }
-      } ) );
-      Executor.Raise();
-
-      AddSelectionToSender( args );
-    }
 
     /// <summary>
     /// Adds a client receiver. Does not "bake" it.
     /// </summary>
     /// <param name="args"></param>
-    public override void AddReceiver( string args )
+    public override void AddReceiver(string args)
     {
-      var client =  JsonConvert.DeserializeObject<dynamic>( args );
-      ClientListWrapper.clients.Add( client );
+      var client = JsonConvert.DeserializeObject<dynamic>(args);
+      ClientListWrapper.clients.Add(client);
 
-      Queue.Add( new Action( () =>
+      Queue.Add(new Action(() =>
+    {
+      using (Transaction t = new Transaction(CurrentDoc.Document, "Adding Speckle Receiver"))
       {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Adding Speckle Receiver" ) )
-        {
-          t.Start();
-          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
-          t.Commit();
-        }
-      } ) );
+        t.Start();
+        SpeckleClientsStorageManager.WriteClients(CurrentDoc.Document, ClientListWrapper);
+        t.Commit();
+      }
+    }));
       Executor.Raise();
     }
 
@@ -426,29 +395,29 @@ namespace SpeckleRevit.UI
     /// Deletes a client, and persists the information to the file.
     /// </summary>
     /// <param name="args"></param>
-    public override void RemoveClient( string args )
+    public override void RemoveClient(string args)
     {
-      var client =  JsonConvert.DeserializeObject<dynamic>( args );
-      var index = ClientListWrapper.clients.FindIndex( cl => cl.clientId == client.clientId );
+      var client = JsonConvert.DeserializeObject<dynamic>(args);
+      var index = ClientListWrapper.clients.FindIndex(cl => cl.clientId == client.clientId);
 
-      if( index == -1 ) return;
+      if (index == -1) return;
 
-      ClientListWrapper.clients.RemoveAt( index );
+      ClientListWrapper.clients.RemoveAt(index);
 
-      var lsIndex = LocalState.FindIndex( x => x.StreamId == (string) client.streamId );
-      if( lsIndex != -1 ) LocalState.RemoveAt( lsIndex );
+      var lsIndex = LocalState.FindIndex(x => x.StreamId == (string)client.streamId);
+      if (lsIndex != -1) LocalState.RemoveAt(lsIndex);
 
       // persist the changes please
-      Queue.Add( new Action( () =>
+      Queue.Add(new Action(() =>
+    {
+      using (Transaction t = new Transaction(CurrentDoc.Document, "Removing Speckle Client"))
       {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Removing Speckle Client" ) )
-        {
-          t.Start();
-          SpeckleStateManager.WriteState( CurrentDoc.Document, LocalState );
-          SpeckleClientsStorageManager.WriteClients( CurrentDoc.Document, ClientListWrapper );
-          t.Commit();
-        }
-      } ) );
+        t.Start();
+        SpeckleStateManager.WriteState(CurrentDoc.Document, LocalState);
+        SpeckleClientsStorageManager.WriteClients(CurrentDoc.Document, ClientListWrapper);
+        t.Commit();
+      }
+    }));
       Executor.Raise();
     }
 
@@ -458,26 +427,26 @@ namespace SpeckleRevit.UI
     /// <returns></returns>
     public override string GetFileClients()
     {
-      var myReadClients = SpeckleClientsStorageManager.ReadClients( CurrentDoc.Document );
-      if( myReadClients == null )
+      var myReadClients = SpeckleClientsStorageManager.ReadClients(CurrentDoc.Document);
+      if (myReadClients == null)
         myReadClients = new SpeckleClientsWrapper();
 
       // Set them up in the class so we're aware of them
       ClientListWrapper = myReadClients;
 
-      return  JsonConvert.SerializeObject( myReadClients.clients );
+      return JsonConvert.SerializeObject(myReadClients.clients);
     }
 
     #endregion
 
     #region Client Actions
 
-    public override void AddObjectsToSender( string args )
+    public override void AddObjectsToSender(string args)
     {
       // NOTE: implemented in the Receiver partial class extension file. Kept here just to prevent compiler errors.
     }
 
-    public override void RemoveObjectsFromSender( string args )
+    public override void RemoveObjectsFromSender(string args)
     {
       // NOTE: implemented in the Receiver partial class extension file. Kept here just to prevent compiler errors.
     }
@@ -486,28 +455,28 @@ namespace SpeckleRevit.UI
     /// Selects the objects from a specific client (receiver or sender).
     /// </summary>
     /// <param name="args"></param>
-    public override void SelectClientObjects( string args )
+    public override void SelectClientObjects(string args)
     {
-      var client =  JsonConvert.DeserializeObject<dynamic>( args );
-      var objIds = LocalState.Find( stream => stream.StreamId == (string) client.streamId ).Objects.Select( obj => (string) obj.Properties[ "revitUniqueId" ] ).ToList();
+      var client = JsonConvert.DeserializeObject<dynamic>(args);
+      var objIds = LocalState.Find(stream => stream.StreamId == (string)client.streamId).Objects.Select(obj => (string)obj.Properties["revitUniqueId"]).ToList();
 
-      Queue.Add( new Action( () =>
+      Queue.Add(new Action(() =>
+    {
+      using (Transaction t = new Transaction(CurrentDoc.Document, "Speckle Select"))
       {
-        using( Transaction t = new Transaction( CurrentDoc.Document, "Speckle Select" ) )
+        t.Start();
+        if (objIds != null)
         {
-          t.Start();
-          if( objIds != null )
+          var objElIds = objIds.Select(obj => CurrentDoc.Document.GetElement(obj)?.Id).Where(id => id != null).ToList();
+          using (var myUiDoc = new UIDocument(CurrentDoc.Document))
           {
-            var objElIds = objIds.Select( obj => CurrentDoc.Document.GetElement( obj )?.Id ).Where( id => id != null ).ToList();
-            using( var myUiDoc = new UIDocument( CurrentDoc.Document ) )
-            {
-              myUiDoc.Selection.SetElementIds( objElIds );
-              myUiDoc.ShowElements( objElIds );
-            }
+            myUiDoc.Selection.SetElementIds(objElIds);
+            myUiDoc.ShowElements(objElIds);
           }
-          t.Commit();
         }
-      } ) );
+        t.Commit();
+      }
+    }));
       Executor.Raise();
     }
 
@@ -526,14 +495,14 @@ namespace SpeckleRevit.UI
 
     public override string GetDocumentId()
     {
-      return GetDocHash( CurrentDoc.Document );
+      return GetDocHash(CurrentDoc.Document);
       // NOTE: If project is copy pasted, it has the same unique id, so the below is not reliable
       //return CurrentDoc.Document.ProjectInformation.UniqueId;
     }
 
-    private string GetDocHash( Document doc )
+    private string GetDocHash(Document doc)
     {
-      return SpeckleCore.Converter.getMd5Hash( doc.PathName + doc.Title );
+      return SpeckleCore.Converter.getMd5Hash(doc.PathName + doc.Title);
     }
 
     public override string GetDocumentLocation()
@@ -544,59 +513,92 @@ namespace SpeckleRevit.UI
 
     #region sender 
 
-    public string GetObjectSelection()
+    //public string GetObjectSelection()
+    //{
+    //  List<dynamic> selectedObjects = new List<dynamic>();
+
+    //  if (CurrentDoc == null) return JsonConvert.SerializeObject(selectedObjects); ;
+
+    //  var selectionIds = CurrentDoc.Selection.GetElementIds();
+    //  foreach (var id in selectionIds)
+    //  {
+    //    var elm = CurrentDoc.Document.GetElement(id);
+    //    var cat = elm.Category;
+    //    var typ = elm.GetType();
+    //    var isFam = elm is FamilyInstance;
+
+    //    if (isFam)
+    //    {
+    //      var fam = (elm as FamilyInstance).Symbol.FamilyName;
+    //    }
+
+    //    selectedObjects.Add(new
+    //    {
+    //      id = elm.UniqueId.ToString(),
+    //      type = typ.Name,
+    //      cat = cat.Name
+    //    });
+    //  }
+
+    //  return JsonConvert.SerializeObject(selectedObjects);
+    //}
+
+    public override List<ISelectionFilter> GetSelectionFilters()
     {
-      List<dynamic> selectedObjects = new List<dynamic>();
-
-      if( CurrentDoc == null ) return  JsonConvert.SerializeObject( selectedObjects ); ;
-
-      var selectionIds = CurrentDoc.Selection.GetElementIds();
-      foreach( var id in selectionIds )
+      var categories = new List<string>();
+      var parameters = new List<string>();
+      if (CurrentDoc != null)
       {
-        var elm = CurrentDoc.Document.GetElement( id );
-        var cat = elm.Category;
-        var typ = elm.GetType();
-        var isFam = elm is FamilyInstance;
+        //selectionCount = CurrentDoc.Selection.GetElementIds().Count();
+        categories = Globals.GetCategoryNames(CurrentDoc.Document);
+        parameters = Globals.GetParameterNames(CurrentDoc.Document);
+      }
 
-        if( isFam )
+
+      return new List<ISelectionFilter>
+      {
+        new ElementsSelectionFilter
         {
-          var fam = (elm as FamilyInstance).Symbol.FamilyName;
+          Name = "Selection",
+          Icon = "mouse",
+          Selection = new List<string>()
+        },
+        new ListSelectionFilter
+        {
+          Name = "Category",
+          Icon = "category",
+          Values = categories
+        },
+        new PropertySelectionFilter
+        {
+          Name = "Parameter",
+          Icon = "filter_list",
+          HasCustomProperty = false,
+          Values = parameters,
+          Operators = new List<string>
+          {
+            "equals",
+            "contains",
+            "is greater than",
+            "is less than"
+          }
         }
-
-        selectedObjects.Add( new
-        {
-          id = elm.UniqueId.ToString(),
-          type = typ.Name,
-          cat = cat.Name
-        } );
-      }
-
-      return  JsonConvert.SerializeObject( selectedObjects );
+      };
     }
 
-    public List<ObjectSelectionFilter> GetFilters()
+    private static List<T> IEnumeratorToList<T>(System.Collections.IEnumerator enumerator)
     {
-      // TODO
-      var selectionIds = CurrentDoc.Selection.GetElementIds();
-
-      var selectedObjectsFilter = new ObjectSelectionFilter() { FilterName = "Selected objects", ObjectCount = selectionIds.Count };
-
-      foreach( Category cat in CurrentDoc.Document.Settings.Categories )
+      List<T> list = new List<T>();
+      while (enumerator.MoveNext())
       {
-
+        list.Add((T)Convert.ChangeType(enumerator.Current, typeof(T)));
       }
-
-      return new List<ObjectSelectionFilter>() { selectedObjectsFilter };
+      return list;
     }
+
 
 
     #endregion
   }
 
-  public class ObjectSelectionFilter
-  {
-    public string FilterName = "Default Filter Name";
-    public int ObjectCount = 0;
-    public bool Toggled = false;
-  }
 }
