@@ -22,6 +22,7 @@ namespace SpeckleRevit.UI
     {
       var client =  JsonConvert.DeserializeObject<dynamic>( args );
       var apiClient = new SpeckleApiClient( (string) client.account.RestApi ) { AuthToken = (string) client.account.Token };
+      apiClient.ClientType = "Revit";
 
       NotifyUi( "update-client",  JsonConvert.SerializeObject( new
       {
