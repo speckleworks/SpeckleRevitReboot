@@ -337,7 +337,7 @@ namespace SpeckleRevit.UI
                 {
                   _id = client._id,
                   expired = true,
-                  message = "The stream state and the application state do not match."
+                  message = ""
                 }));
               }
             }
