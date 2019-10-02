@@ -48,6 +48,8 @@ namespace SpeckleRevit.UI
 
       ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), GetFilterType(client.filter.Type.ToString()));
       GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
+
+      SpeckleTelemetry.RecordStreamCreated( "Revit" );
     }
 
     public override void UpdateSender(string args)
@@ -73,6 +75,8 @@ namespace SpeckleRevit.UI
 
       ISelectionFilter filter = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(client.filter), GetFilterType(client.filter.Type.ToString()));
       GetSelectionFilterObjects(filter, client._id.ToString(), client.streamId.ToString());
+
+      SpeckleTelemetry.RecordStreamUpdated( "Revit" );
     }
 
     // NOTE: This is actually triggered when clicking "Push!"
@@ -204,6 +208,7 @@ namespace SpeckleRevit.UI
         errors
       } ) );
 
+      SpeckleTelemetry.RecordStreamUpdated( "Revit" );
     }
 
     /// <summary>
