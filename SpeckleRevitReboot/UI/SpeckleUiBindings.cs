@@ -547,11 +547,13 @@ namespace SpeckleRevit.UI
     {
       var categories = new List<string>();
       var parameters = new List<string>();
+      var views = new List<string>();
       if (CurrentDoc != null)
       {
         //selectionCount = CurrentDoc.Selection.GetElementIds().Count();
         categories = Globals.GetCategoryNames(CurrentDoc.Document);
         parameters = Globals.GetParameterNames(CurrentDoc.Document);
+        views = Globals.GetViewNames(CurrentDoc.Document);
       }
 
 
@@ -568,6 +570,12 @@ namespace SpeckleRevit.UI
           Name = "Category",
           Icon = "category",
           Values = categories
+        },
+        new ListSelectionFilter
+        {
+          Name = "View",
+          Icon = "remove_red_eye",
+          Values = views
         },
         new PropertySelectionFilter
         {

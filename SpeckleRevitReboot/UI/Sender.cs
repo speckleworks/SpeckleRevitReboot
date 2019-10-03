@@ -309,9 +309,30 @@ namespace SpeckleRevit.UI
 
         selectionIds = new FilteredElementCollector(doc)
           .WhereElementIsNotElementType()
+          .WhereElementIsViewIndependent()
           .WherePasses(categoryFilter)
           .Select(x => x.UniqueId).ToList();
 
+      }
+      else if (filter.Name == "View")
+      {
+        var viewFilter = filter as ListSelectionFilter;
+
+        var views = new FilteredElementCollector(doc)
+          .WhereElementIsNotElementType()
+          .OfClass(typeof(View))
+          .Where(x => viewFilter.Selection.Contains(x.Name));
+        
+        foreach(var view in views)
+        {
+          var ids = new FilteredElementCollector(doc,view.Id)
+          .WhereElementIsNotElementType()
+          .WhereElementIsViewIndependent()
+          .Where(x => x.IsPhysicalElement())
+          .Select(x => x.UniqueId).ToList();
+
+          selectionIds = selectionIds.Union(ids).ToList();
+        }
       }
       else if (filter.Name == "Parameter")
       {
@@ -320,8 +341,9 @@ namespace SpeckleRevit.UI
           var propFilter = filter as PropertySelectionFilter;
           var query = new FilteredElementCollector(doc)
             .WhereElementIsNotElementType()
+            .WhereElementIsNotElementType()
             .WhereElementIsViewIndependent()
-            .OfClass(typeof(FamilyInstance))
+            .Where(x => x.IsPhysicalElement())
             .Where(fi => fi.LookupParameter(propFilter.PropertyName) != null);
 
           propFilter.PropertyValue = propFilter.PropertyValue.ToLowerInvariant();
