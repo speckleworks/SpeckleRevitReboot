@@ -110,6 +110,32 @@ namespace SpeckleRevit
         return e.Category.CategoryType == CategoryType.Model && e.Category.CanAddSubcategory;
       }
 
+    private static List<string> SadFaces = new List<string>
+    {
+      "ಠ_ಠ",
+      "(╯°□°）╯︵ ┻━┻",
+"ლ(｀ー´ლ)",
+"ʕ •`ᴥ•´ʔ",
+"¯\\_(ツ)_/¯",
+"ლ(ಠ益ಠლ)",
+"ಥ_ಥ",
+"ᕦ(ò_óˇ)ᕤ",
+"¿ⓧ_ⓧﮌ",
+"༼∵༽ ༼⍨༽ ༼⍢༽ ༼⍤༽",
+"ヽ༼ ಠ益ಠ ༽ﾉ",
+"(Ծ‸ Ծ)",
+"ح(•̀ж•́)ง",
+"(⩾﹏⩽)",
+"{ಠʖಠ}"
+    };
+
+    public static string GetRandomSadFace()
+    {
+      var random = new Random();
+      int index = random.Next(SadFaces.Count);
+      return SadFaces[index];
+    }
+
     
 
   }

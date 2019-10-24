@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using SpeckleCore;
 using Newtonsoft.Json;
+using SpeckleCore.Data;
 
 namespace SpeckleRevit.UI
 {
@@ -96,8 +97,11 @@ namespace SpeckleRevit.UI
 
       // ADD/MOD/LEAVE ALONE EXISTING OBJECTS 
 
+      //if the conversion completely fails, it outputs a speckleerror and it's put in here
+      var errors = new List<SpeckleError>();
+
       var tempList = new List<SpeckleObject>();
-      int i = 0, failedToBake = 0;
+      int i = 0;
       foreach( var mySpkObj in ToAddOrMod )
       {
         Queue.Add( new Action( () =>
@@ -162,13 +166,17 @@ namespace SpeckleRevit.UI
                 }
               }
 
-              if( res is SpeckleObject || res == null ) failedToBake++;
+              //if( res is SpeckleObject || res == null ) failedToBake++;
+
+              if (res is SpeckleError)
+                errors.Add(res as SpeckleError);
 
             }
             catch( Exception e )
             {
               //if(e.Message.Contains("missing"))
-              failedToBake++;
+              //failedToBake++;
+              errors.Add(new SpeckleError { Message=e.Message });
             }
 
             t.Commit();
@@ -198,27 +206,45 @@ namespace SpeckleRevit.UI
           t.Commit();
         }
 
-        string errors = "";
-        if( failedToBake > 0 )
+        string errorMsg = "";
+        int failedToConvert = errors.Count();
+        
+        //other conversion errors that we are catching
+        var additionalErrors = GetAndClearConversionErrors();
+
+        if (additionalErrors != null && additionalErrors.Count > 0)
         {
-          errors = String.Format( "<v-layout row wrap><v-flex xs12>Failed to convert and bake {0} objects.</v-flex></v-layout>", failedToBake );
+          errors.AddRange(additionalErrors);        
         }
 
-        var missing = GetAndClearMissingFamilies();
-        if( missing != null && missing.Count > 0 )
-        {
-          errors += "" +
-          //errors += "<v-divider></v-divider>" +
-          "<v-layout row wrap><v-flex xs12>" +
-          "<strong>Missing families:</strong>&nbsp;&nbsp;";
+        //remove duplicates
+        errors = errors.GroupBy(x => x.Message).Select(x=>x.First()).ToList();
 
-          foreach( var fam in missing )
-          {
-            errors += string.Format( "<code>{0}</code>&nbsp;", fam );
-          }
+        if (errors.Any())
+          errorMsg += string.Format("There {0} {1} error{2} ",
+            errors.Count() == 1 ? "is" : "are",
+            errors.Count(),
+            errors.Count() == 1 ? "" : "s");
+        if (failedToConvert > 0)
+          errorMsg += string.Format("and {0} objects that failed to convert ",
+            failedToConvert,
+            failedToConvert == 1 ? "" : "s");
 
-          errors += "</v-flex></v-layout>";
-        }
+        errorMsg += Globals.GetRandomSadFace();
+        //if(errors.Any())
+        //{
+        //  errorMsg += "" +
+        //  //errors += "<v-divider></v-divider>" +
+        //  "<v-layout row wrap><v-flex xs12>";
+        //  //"<strong>Missing families:</strong>&nbsp;&nbsp;";
+
+        //  foreach( var err in errors)
+        //  {
+        //    errorMsg += $"<code>{err.Message}</code>&nbsp;";
+        //  }
+
+        //  errorMsg += "</v-flex></v-layout>";
+        //}
 
         NotifyUi( "update-client",  JsonConvert.SerializeObject( new
         {
@@ -226,6 +252,7 @@ namespace SpeckleRevit.UI
           loading = false,
           isLoadingIndeterminate = true,
           loadingBlurb = string.Format( "Done." ),
+          errorMsg,
           errors
         } ) );
 
