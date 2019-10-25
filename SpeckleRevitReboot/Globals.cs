@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using SpeckleCore.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace SpeckleRevit
   {
     private static List<string> _cachedParameters = null;
     private static List<string> _cachedViews = null;
+    public static List<SpeckleError> ConversionErrors { get; set; }
 
 
     private static Dictionary<string, Category> _categories { get; set; }
@@ -78,7 +80,7 @@ namespace SpeckleRevit
         .OfClass(typeof(View))
         .ToElements();
 
-      _cachedViews = els.Select(x => x.Name).OrderBy(x=>x).ToList();
+      _cachedViews = els.Select(x => x.Name).OrderBy(x => x).ToList();
       return _cachedViews;
     }
 
@@ -99,34 +101,32 @@ namespace SpeckleRevit
 
     }
 
-
-
-      public static bool IsPhysicalElement(this Element e)
-      {
-        if (e.Category == null) return false;
-        if (e.ViewSpecific) return false;
-        // exclude specific unwanted categories
-        if (((BuiltInCategory)e.Category.Id.IntegerValue) == BuiltInCategory.OST_HVAC_Zones) return false;
-        return e.Category.CategoryType == CategoryType.Model && e.Category.CanAddSubcategory;
-      }
+    public static bool IsPhysicalElement(this Element e)
+    {
+      if (e.Category == null) return false;
+      if (e.ViewSpecific) return false;
+      // exclude specific unwanted categories
+      if (((BuiltInCategory)e.Category.Id.IntegerValue) == BuiltInCategory.OST_HVAC_Zones) return false;
+      return e.Category.CategoryType == CategoryType.Model && e.Category.CanAddSubcategory;
+    }
 
     private static List<string> SadFaces = new List<string>
     {
       "ಠ_ಠ",
       "(╯°□°）╯︵ ┻━┻",
-"ლ(｀ー´ლ)",
-"ʕ •`ᴥ•´ʔ",
-"¯\\_(ツ)_/¯",
-"ლ(ಠ益ಠლ)",
-"ಥ_ಥ",
-"ᕦ(ò_óˇ)ᕤ",
-"¿ⓧ_ⓧﮌ",
-"༼∵༽ ༼⍨༽ ༼⍢༽ ༼⍤༽",
-"ヽ༼ ಠ益ಠ ༽ﾉ",
-"(Ծ‸ Ծ)",
-"ح(•̀ж•́)ง",
-"(⩾﹏⩽)",
-"{ಠʖಠ}"
+      "ლ(｀ー´ლ)",
+      "ʕ •`ᴥ•´ʔ",
+      "¯\\_(ツ)_/¯",
+      "ლ(ಠ益ಠლ)",
+      "ಥ_ಥ",
+      "ᕦ(ò_óˇ)ᕤ",
+      "¿ⓧ_ⓧﮌ",
+      "༼∵༽ ༼⍨༽ ༼⍢༽ ༼⍤༽",
+      "ヽ༼ ಠ益ಠ ༽ﾉ",
+      "(Ծ‸ Ծ)",
+      "ح(•̀ж•́)ง",
+      "(⩾﹏⩽)",
+      "{ಠʖಠ}"
     };
 
     public static string GetRandomSadFace()
@@ -136,7 +136,7 @@ namespace SpeckleRevit
       return SadFaces[index];
     }
 
-    
+
 
   }
 }

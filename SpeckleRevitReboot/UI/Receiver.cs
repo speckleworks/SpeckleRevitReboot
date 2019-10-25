@@ -99,6 +99,8 @@ namespace SpeckleRevit.UI
 
       //if the conversion completely fails, it outputs a speckleerror and it's put in here
       var errors = new List<SpeckleError>();
+      //this instead will store errors swallowed by the erroreater class
+      Globals.ConversionErrors = new List<SpeckleError>();
 
       var tempList = new List<SpeckleObject>();
       int i = 0;
@@ -216,21 +218,25 @@ namespace SpeckleRevit.UI
         {
           errors.AddRange(additionalErrors);        
         }
+        errors.AddRange(Globals.ConversionErrors);
 
         //remove duplicates
         errors = errors.GroupBy(x => x.Message).Select(x=>x.First()).ToList();
 
         if (errors.Any())
+        {
           errorMsg += string.Format("There {0} {1} error{2} ",
-            errors.Count() == 1 ? "is" : "are",
-            errors.Count(),
-            errors.Count() == 1 ? "" : "s");
-        if (failedToConvert > 0)
-          errorMsg += string.Format("and {0} objects that failed to convert ",
-            failedToConvert,
-            failedToConvert == 1 ? "" : "s");
+           errors.Count() == 1 ? "is" : "are",
+           errors.Count(),
+           errors.Count() == 1 ? "" : "s");
+          if (failedToConvert > 0)
+            errorMsg += string.Format("and {0} objects that failed to convert ",
+              failedToConvert,
+              failedToConvert == 1 ? "" : "s");
 
-        errorMsg += Globals.GetRandomSadFace();
+          errorMsg += "<nobr>"+Globals.GetRandomSadFace()+"</nobr>";
+        }
+         
         //if(errors.Any())
         //{
         //  errorMsg += "" +
