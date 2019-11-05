@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using SpeckleCore;
+using SpeckleCore.Data;
 using SpeckleRevit.Storage;
 using SpeckleUiBase;
 
@@ -105,9 +106,9 @@ namespace SpeckleRevit.UI
 
       int i = 0;
       long currentBucketSize = 0;
-      var errors = "";
-      var failedSend = 0;
-      var failedConvert = 0;
+      var errorMsg = "";
+      var failedToConvert = 0;
+      var errors = new List<SpeckleError>();
       foreach (var obj in objects)
       {
         NotifyUi("update-client", JsonConvert.SerializeObject(new
@@ -119,17 +120,29 @@ namespace SpeckleRevit.UI
           loadingBlurb = string.Format("Converting and uploading objects: {0} / {1}", i, objects.Count())
         }));
 
+        var id = 0;
+        Element revitElement = null;
         try
         {
-          var revitElement = CurrentDoc.Document.GetElement((string)obj.Properties["revitUniqueId"]);
+          revitElement = CurrentDoc.Document.GetElement((string)obj.Properties["revitUniqueId"]);
+          id = revitElement.Id.IntegerValue;
+        }
+        catch (Exception e)
+        {
+          errors.Add(new SpeckleError { Message = "Could not retrieve element", Details = e.Message });
+          continue;
+        }
 
+        try
+        {
           var conversionResult = SpeckleCore.Converter.Serialise(new List<object>() { revitElement });
           var byteCount = Converter.getBytes(conversionResult).Length;
           currentBucketSize += byteCount;
 
           if (byteCount > 2e6)
           {
-            var problemId = revitElement.Id;
+            errors.Add(new SpeckleError { Message = "Element is too big to be sent", Details = $"Element {id} is bigger than 2MB, it will be skipped"});
+            continue;
           }
 
           convertedObjects.AddRange(conversionResult);
@@ -151,12 +164,7 @@ namespace SpeckleRevit.UI
             }
             catch (Exception e)
             {
-              failedSend += convertedObjects.Count;
-              NotifyUi("update-client", JsonConvert.SerializeObject(new
-              {
-                _id = (string)client._id,
-                errors = "Failed to send " + failedSend + " objects."
-              }));
+              errors.Add(new SpeckleError { Message = $"Failed to send {convertedObjects.Count} objects", Details = e.Message });
             }
             currentBucketSize = 0;
             convertedObjects = new List<SpeckleObject>(); // reset the chunkness
@@ -164,17 +172,36 @@ namespace SpeckleRevit.UI
         }
         catch (Exception e)
         {
-          failedConvert++;
-          NotifyUi("update-client", JsonConvert.SerializeObject(new
-          {
-            _id = (string)client._id,
-            errors = "Failed to convert " + failedConvert + " objects."
-          }));
+          failedToConvert++;
+          errors.Add(new SpeckleError { Message = $"Failed to convert {revitElement.Name}", Details = $"Element id: {id}" });
+
+          //NotifyUi("update-client", JsonConvert.SerializeObject(new
+          //{
+          //  _id = (string)client._id,
+          //  errors = "Failed to convert " + failedConvert + " objects."
+          //}));
         }
       }
 
-      if (failedConvert > 0) errors += String.Format("Failed to convert a total of {0} objects. ", failedConvert);
-      if (failedSend > 0) errors += String.Format("Failed to send a total of {0} objects. ", failedSend);
+      if (failedToConvert > 0)
+        errorMsg += String.Format("Failed to convert a total of {0} objects. ", failedToConvert);
+      else
+
+      if (errors.Any())
+      {
+        if (failedToConvert > 0)
+          errorMsg += string.Format("Failed to convert {0} objects ",
+            failedToConvert,
+            failedToConvert == 1 ? "" : "s");
+        else 
+        errorMsg += string.Format("There {0} {1} error{2} ",
+         errors.Count() == 1 ? "is" : "are",
+         errors.Count(),
+         errors.Count() == 1 ? "" : "s");
+       
+
+        errorMsg += "<nobr>" + Globals.GetRandomSadFace() + "</nobr>";
+      }
 
       var myStream = new SpeckleStream() { Objects = placeholders };
 
@@ -205,6 +232,7 @@ namespace SpeckleRevit.UI
         loading = false,
         loadingBlurb = "",
         message = $"Done sending {objects.Count()} object{plural}.",
+        errorMsg,
         errors
       }));
 
