@@ -183,10 +183,6 @@ namespace SpeckleRevit.UI
         }
       }
 
-      if (failedToConvert > 0)
-        errorMsg += String.Format("Failed to convert a total of {0} objects. ", failedToConvert);
-      else
-
       if (errors.Any())
       {
         if (failedToConvert > 0)

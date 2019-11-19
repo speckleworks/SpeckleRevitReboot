@@ -23,6 +23,8 @@ namespace SpeckleRevit.UI
   {
     public static UIApplication RevitApp;
     public static UIDocument CurrentDoc { get => RevitApp.ActiveUIDocument; }
+    public static SpeckleUiWindow SpeckleWindow;
+
 
     /// <summary>
     /// Stores the actions for the ExternalEvent handler
