@@ -23,51 +23,22 @@ namespace SpeckleRevit.UI
     /// <param name="args">Serialised client coming from the ui.</param>
     public override void BakeReceiver(string args)
     {
-      // create a thread  
-      Thread newWindowThread = new Thread(new ThreadStart(() =>
-      {
-        // create and show the window
-        DoBakeReceiver(args);
-
-        // start the Dispatcher processing  
-        System.Windows.Threading.Dispatcher.Run();
-      }));
-
-      // set the apartment state  
-      newWindowThread.SetApartmentState(ApartmentState.STA);
-
-      // make the thread a background thread  
-      newWindowThread.IsBackground = true;
-
-      // start the thread  
-      newWindowThread.Start();
-
-    }
-
-    public void DoBakeReceiver(string args)
-    {
-     
-
       var client = JsonConvert.DeserializeObject<dynamic>(args);
       var apiClient = new SpeckleApiClient((string)client.account.RestApi) { AuthToken = (string)client.account.Token };
       apiClient.ClientType = "Revit";
 
-      var progressBar = new SpeckleProgressBar();
-      progressBar.Dispatcher.Invoke(() =>
+      //dispatch on the cef window to let progress bar update
+      SpeckleWindow.Dispatcher.Invoke(() =>
       {
-        progressBar.ProgressText.Content = "Getting stream from server...";
-        progressBar.Progress.IsIndeterminate = true;
-        progressBar.Show();
-     
-     
+        NotifyUi("update-client", JsonConvert.SerializeObject(new
+        {
+          _id = (string)client._id,
+          loading = true,
+          loadingBlurb = "Getting stream from server..."
+        }));
       }, System.Windows.Threading.DispatcherPriority.Background);
 
-      NotifyUi("update-client", JsonConvert.SerializeObject(new
-      {
-        _id = (string)client._id,
-        loading = true,
-        loadingBlurb = "Getting stream from server..."
-      }));
+
 
       var previousStream = LocalState.FirstOrDefault(s => s.StreamId == (string)client.streamId);
       var stream = apiClient.StreamGetAsync((string)client.streamId, "").Result.Resource;
@@ -101,13 +72,19 @@ namespace SpeckleRevit.UI
 
       var (toDelete, ToAddOrMod) = DiffStreamStates(previousStream, stream);
 
-      NotifyUi("update-client", JsonConvert.SerializeObject(new
+      SpeckleWindow.Dispatcher.Invoke(() =>
       {
-        _id = (string)client._id,
-        loading = true,
-        loadingBlurb = "Deleting " + toDelete.Count() + " objects.",
-        objects = stream.Objects
-      }));
+        NotifyUi("update-client", JsonConvert.SerializeObject(new
+        {
+          _id = (string)client._id,
+          loading = true,
+          loadingBlurb = "Deleting " + toDelete.Count() + " objects.",
+          objects = stream.Objects
+        }));
+
+      }, System.Windows.Threading.DispatcherPriority.Background);
+
+
 
       // DELETION OF OLD OBJECTS
       if (toDelete.Count() > 0)
@@ -145,26 +122,23 @@ namespace SpeckleRevit.UI
       using (var t = new Transaction(CurrentDoc.Document, "Speckle Bake"))
       {
         t.Start();
-       
+
         int i = 0;
         foreach (var mySpkObj in ToAddOrMod)
         {
-
-            progressBar.Dispatcher.Invoke(() =>
+          SpeckleWindow.Dispatcher.Invoke(() =>
+          {
+            NotifyUi("update-client", JsonConvert.SerializeObject(new
             {
-              progressBar.ProgressText.Content = string.Format("Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count);
-            progressBar.Progress.IsIndeterminate = false;
-            progressBar.Progress.Value = 1f * i / ToAddOrMod.Count * 100;
+              _id = (string)client._id,
+              loading = true,
+              isLoadingIndeterminate = false,
+              loadingProgress = 1f * i / ToAddOrMod.Count * 100,
+              loadingBlurb = string.Format("Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count)
+            }));
           }, System.Windows.Threading.DispatcherPriority.Background);
 
-          NotifyUi("update-client", JsonConvert.SerializeObject(new
-          {
-            _id = (string)client._id,
-            loading = true,
-            isLoadingIndeterminate = false,
-            loadingProgress = 1f * i / ToAddOrMod.Count * 100,
-            loadingBlurb = string.Format("Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count)
-          }));
+
 
           object res;
 
@@ -239,13 +213,18 @@ namespace SpeckleRevit.UI
 
       Queue.Add(new Action(() =>
     {
-      NotifyUi("update-client", JsonConvert.SerializeObject(new
+      SpeckleWindow.Dispatcher.Invoke(() =>
       {
-        _id = (string)client._id,
-        loading = true,
-        isLoadingIndeterminate = true,
-        loadingBlurb = string.Format("Updating shadow state.")
-      }));
+        NotifyUi("update-client", JsonConvert.SerializeObject(new
+        {
+          _id = (string)client._id,
+          loading = true,
+          isLoadingIndeterminate = true,
+          loadingBlurb = string.Format("Updating shadow state.")
+        }));
+      }, System.Windows.Threading.DispatcherPriority.Background);
+
+
 
       // set the local state stream's object list, and inject it in the kits, persist it in the doc
       previousStream.Objects = tempList;
@@ -301,20 +280,20 @@ namespace SpeckleRevit.UI
       //  errorMsg += "</v-flex></v-layout>";
       //}
 
-      //progressBar.Dispatcher.Invoke(() =>
-      //{
-        progressBar.Close();
-      //}, System.Windows.Threading.DispatcherPriority.Background);
-
-      NotifyUi("update-client", JsonConvert.SerializeObject(new
+      SpeckleWindow.Dispatcher.Invoke(() =>
       {
-        _id = (string)client._id,
-        loading = false,
-        isLoadingIndeterminate = true,
-        loadingBlurb = string.Format("Done."),
-        errorMsg,
-        errors
-      }));
+        NotifyUi("update-client", JsonConvert.SerializeObject(new
+        {
+          _id = (string)client._id,
+          loading = false,
+          isLoadingIndeterminate = true,
+          loadingBlurb = string.Format("Done."),
+          errorMsg,
+          errors
+        }));
+      }, System.Windows.Threading.DispatcherPriority.Background);
+
+
 
     }));
 
