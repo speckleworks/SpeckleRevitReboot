@@ -8,27 +8,59 @@ using Autodesk.Revit.DB;
 using SpeckleCore;
 using Newtonsoft.Json;
 using SpeckleCore.Data;
+using System.Windows;
+using System.Threading;
 
 namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit
   {
-
-    public override void BakeReceiver(string args)
-    {
-      SpeckleWindow.Dispatcher.Invoke(() => DoBakeReceiver(args), System.Windows.Threading.DispatcherPriority.Background);
-    }
     /// <summary>
     /// This function will bake the objects in the given receiver. Behaviour:
     /// 1) Fresh bake: objects are created
     /// 2) Diff bake: old objects are deleted, any overlapping objects (by applicationId) are either edited or left alone if not marked as having been user modified, new objects are created.
     /// </summary>
     /// <param name="args">Serialised client coming from the ui.</param>
+    public override void BakeReceiver(string args)
+    {
+      // create a thread  
+      Thread newWindowThread = new Thread(new ThreadStart(() =>
+      {
+        // create and show the window
+        DoBakeReceiver(args);
+
+        // start the Dispatcher processing  
+        System.Windows.Threading.Dispatcher.Run();
+      }));
+
+      // set the apartment state  
+      newWindowThread.SetApartmentState(ApartmentState.STA);
+
+      // make the thread a background thread  
+      newWindowThread.IsBackground = true;
+
+      // start the thread  
+      newWindowThread.Start();
+
+    }
+
     public void DoBakeReceiver(string args)
     {
+     
+
       var client = JsonConvert.DeserializeObject<dynamic>(args);
       var apiClient = new SpeckleApiClient((string)client.account.RestApi) { AuthToken = (string)client.account.Token };
       apiClient.ClientType = "Revit";
+
+      var progressBar = new SpeckleProgressBar();
+      progressBar.Dispatcher.Invoke(() =>
+      {
+        progressBar.ProgressText.Content = "Getting stream from server...";
+        progressBar.Progress.IsIndeterminate = true;
+        progressBar.Show();
+     
+     
+      }, System.Windows.Threading.DispatcherPriority.Background);
 
       NotifyUi("update-client", JsonConvert.SerializeObject(new
       {
@@ -117,6 +149,14 @@ namespace SpeckleRevit.UI
         int i = 0;
         foreach (var mySpkObj in ToAddOrMod)
         {
+
+            progressBar.Dispatcher.Invoke(() =>
+            {
+              progressBar.ProgressText.Content = string.Format("Creating/updating objects: {0} / {1}", i, ToAddOrMod.Count);
+            progressBar.Progress.IsIndeterminate = false;
+            progressBar.Progress.Value = 1f * i / ToAddOrMod.Count * 100;
+          }, System.Windows.Threading.DispatcherPriority.Background);
+
           NotifyUi("update-client", JsonConvert.SerializeObject(new
           {
             _id = (string)client._id,
@@ -260,6 +300,11 @@ namespace SpeckleRevit.UI
 
       //  errorMsg += "</v-flex></v-layout>";
       //}
+
+      //progressBar.Dispatcher.Invoke(() =>
+      //{
+        progressBar.Close();
+      //}, System.Windows.Threading.DispatcherPriority.Background);
 
       NotifyUi("update-client", JsonConvert.SerializeObject(new
       {
