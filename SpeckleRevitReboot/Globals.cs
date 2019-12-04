@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using SpeckleCore.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace SpeckleRevit
   public static class Globals
   {
     private static List<string> _cachedParameters = null;
+    private static List<string> _cachedViews = null;
+    public static List<SpeckleError> ConversionErrors { get; set; }
 
 
     private static Dictionary<string, Category> _categories { get; set; }
@@ -37,8 +40,7 @@ namespace SpeckleRevit
       var els = new FilteredElementCollector(doc)
         .WhereElementIsNotElementType()
         .WhereElementIsViewIndependent()
-        .OfClass(typeof(FamilyInstance))
-        .ToElements();
+        .Where(x => x.IsPhysicalElement());
 
       List<string> parameters = new List<string>();
 
@@ -70,6 +72,71 @@ namespace SpeckleRevit
       return GetParameterNamesAsync(doc).Result;
 
     }
+
+    private async static Task<List<string>> GetViewNamesAsync(Document doc)
+    {
+      var els = new FilteredElementCollector(doc)
+        .WhereElementIsNotElementType()
+        .OfClass(typeof(View))
+        .ToElements();
+
+      _cachedViews = els.Select(x => x.Name).OrderBy(x => x).ToList();
+      return _cachedViews;
+    }
+
+    /// <summary>
+    /// Each time it's called the cached parameters are return, and a new copy is cached
+    /// </summary>
+    /// <param name="doc"></param>
+    /// <returns></returns>
+    public static List<string> GetViewNames(Document doc)
+    {
+      if (_cachedViews != null)
+      {
+        //don't wait for it to finish
+        GetViewNamesAsync(doc);
+        return _cachedViews;
+      }
+      return GetViewNamesAsync(doc).Result;
+
+    }
+
+    public static bool IsPhysicalElement(this Element e)
+    {
+      if (e.Category == null) return false;
+      if (e.ViewSpecific) return false;
+      // exclude specific unwanted categories
+      if (((BuiltInCategory)e.Category.Id.IntegerValue) == BuiltInCategory.OST_HVAC_Zones) return false;
+      return e.Category.CategoryType == CategoryType.Model && e.Category.CanAddSubcategory;
+    }
+
+    private static List<string> SadFaces = new List<string>
+    {
+      "ಠ_ಠ",
+      "(╯°□°）╯︵ ┻━┻",
+      "ლ(｀ー´ლ)",
+      "ʕ •`ᴥ•´ʔ",
+      "¯\\_(ツ)_/¯",
+      "ლ(ಠ益ಠლ)",
+      "ಥ_ಥ",
+      "ᕦ(ò_óˇ)ᕤ",
+      "¿ⓧ_ⓧﮌ",
+      "༼∵༽ ༼⍨༽ ༼⍢༽ ༼⍤༽",
+      "ヽ༼ ಠ益ಠ ༽ﾉ",
+      "(Ծ‸ Ծ)",
+      "ح(•̀ж•́)ง",
+      "(⩾﹏⩽)",
+      "{ಠʖಠ}"
+    };
+
+    public static string GetRandomSadFace()
+    {
+      var random = new Random();
+      int index = random.Next(SadFaces.Count);
+      return SadFaces[index];
+    }
+
+
 
   }
 }

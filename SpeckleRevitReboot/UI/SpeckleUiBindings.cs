@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using SpeckleCore;
+using SpeckleCore.Data;
 using SpeckleRevit.Storage;
 using SpeckleUiBase;
 
@@ -22,6 +23,8 @@ namespace SpeckleRevit.UI
   {
     public static UIApplication RevitApp;
     public static UIDocument CurrentDoc { get => RevitApp.ActiveUIDocument; }
+    public static SpeckleUiWindow SpeckleWindow;
+
 
     /// <summary>
     /// Stores the actions for the ExternalEvent handler
@@ -194,10 +197,11 @@ namespace SpeckleRevit.UI
     }
 
     /// <summary>
-    /// Gets from a speckle kit a "MissingFamiliesAndTypes" string hashset. This is populated during conversion to revit by the ToNative methods. This list is then sent to the UI.
+    /// Gets from a speckle kit a "ConversionErrors" hashset. This is populated during conversion to revit by the ToNative methods. This list is then sent to the UI.
+    /// DO NO USE in other client types if concurrent receivers are allowed to run
     /// </summary>
     /// <returns></returns>
-    public List<string> GetAndClearMissingFamilies()
+    public List<SpeckleError> GetAndClearConversionErrors()
     {
       var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
       foreach (var ass in assemblies)
@@ -208,20 +212,50 @@ namespace SpeckleRevit.UI
           if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
           {
             var typessss = type.GetProperties().Select(p => p.Name).ToList();
-            if (type.GetProperties().Select(p => p.Name).Contains("MissingFamiliesAndTypes"))
+            if (type.GetProperties().Select(p => p.Name).Contains("ConversionErrors"))
             {
-              var missingSet = type.GetProperty("MissingFamiliesAndTypes").GetValue(type);
-              var missingList = ((HashSet<string>)missingSet).ToList();
+              var errorSet = type.GetProperty("ConversionErrors").GetValue(type);
+              var errorList = ((HashSet<SpeckleError>)errorSet).ToList();
 
-              type.GetProperty("MissingFamiliesAndTypes").SetValue(null, new HashSet<string>());
+              type.GetProperty("ConversionErrors").SetValue(null, new HashSet<SpeckleError>());
 
-              return missingList;
+              return errorList;
             }
           }
         }
       }
       return null;
     }
+
+    /// <summary>
+    /// Gets from a speckle kit a "MissingFamiliesAndTypes" string hashset. This is populated during conversion to revit by the ToNative methods. This list is then sent to the UI.
+    /// </summary>
+    /// <returns></returns>
+    //public List<string> GetAndClearMissingFamilies()
+    //{
+    //  var assemblies = SpeckleCore.SpeckleInitializer.GetAssemblies();
+    //  foreach (var ass in assemblies)
+    //  {
+    //    var types = ass.GetTypes();
+    //    foreach (var type in types)
+    //    {
+    //      if (type.GetInterfaces().Contains(typeof(SpeckleCore.ISpeckleInitializer)))
+    //      {
+    //        var typessss = type.GetProperties().Select(p => p.Name).ToList();
+    //        if (type.GetProperties().Select(p => p.Name).Contains("MissingFamiliesAndTypes"))
+    //        {
+    //          var missingSet = type.GetProperty("MissingFamiliesAndTypes").GetValue(type);
+    //          var missingList = ((HashSet<string>)missingSet).ToList();
+
+    //          type.GetProperty("MissingFamiliesAndTypes").SetValue(null, new HashSet<string>());
+
+    //          return missingList;
+    //        }
+    //      }
+    //    }
+    //  }
+    //  return null;
+    //}
 
     public object GetAndClearUnitDictionary()
     {
@@ -547,11 +581,13 @@ namespace SpeckleRevit.UI
     {
       var categories = new List<string>();
       var parameters = new List<string>();
+      var views = new List<string>();
       if (CurrentDoc != null)
       {
         //selectionCount = CurrentDoc.Selection.GetElementIds().Count();
         categories = Globals.GetCategoryNames(CurrentDoc.Document);
         parameters = Globals.GetParameterNames(CurrentDoc.Document);
+        views = Globals.GetViewNames(CurrentDoc.Document);
       }
 
 
@@ -568,6 +604,12 @@ namespace SpeckleRevit.UI
           Name = "Category",
           Icon = "category",
           Values = categories
+        },
+        new ListSelectionFilter
+        {
+          Name = "View",
+          Icon = "remove_red_eye",
+          Values = views
         },
         new PropertySelectionFilter
         {
