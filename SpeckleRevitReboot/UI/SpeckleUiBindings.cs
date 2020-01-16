@@ -271,10 +271,18 @@ namespace SpeckleRevit.UI
             var typessss = type.GetProperties().Select(p => p.Name).ToList();
             if (type.GetProperties().Select(p => p.Name).Contains("UnitDictionary"))
             {
-              var copy = new Dictionary<string, string>((Dictionary<string, string>)type.GetProperty("UnitDictionary").GetValue(type));
-              type.GetProperty("UnitDictionary").SetValue(null, new Dictionary<string, string>());
+              try
+              {
+                var copy = new Dictionary<string, string>((Dictionary<string, string>)type.GetProperty("UnitDictionary").GetValue(type));
+                type.GetProperty("UnitDictionary").SetValue(null, new Dictionary<string, string>());
 
-              return copy;
+                return copy;
+              }
+              catch (Exception e)
+              {
+
+              }
+              return null;
             }
           }
         }
