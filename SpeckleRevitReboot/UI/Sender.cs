@@ -101,7 +101,7 @@ namespace SpeckleRevit.UI
       var convertedObjects = new List<SpeckleObject>();
       var placeholders = new List<SpeckleObject>();
 
-      var units = CurrentDoc.Document.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits.ToString().ToLower().Replace("dut_", "");
+      var units = CurrentDoc.Document.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits.ToString().ToLowerInvariant().Replace("dut_", "");
       InjectScaleInKits(GetScale(units)); // this is used for feet to sane units conversion.
 
       int i = 0;

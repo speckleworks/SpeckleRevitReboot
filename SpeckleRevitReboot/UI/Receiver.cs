@@ -15,6 +15,7 @@ namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit
   {
+    #region overries
     /// <summary>
     /// This function will bake the objects in the given receiver. Behaviour:
     /// 1) Fresh bake: objects are created
@@ -301,6 +302,25 @@ namespace SpeckleRevit.UI
     }
 
     /// <summary>
+    /// Shows/hides the zoom on selected objects button
+    /// </summary>
+    /// <returns></returns>
+    public override bool CanSelectObjects()
+    {
+      return true;
+    }
+
+    /// <summary>
+    /// Shows/hides the toggle preview icon 
+    /// </summary>
+    /// <returns></returns>
+    public override bool CanTogglePreview()
+    {
+      return false;
+    }
+
+    #endregion
+    /// <summary>
     /// Diffs stream objects based on appId + _id non-matching.
     /// </summary>
     /// <param name="Old"></param>
@@ -328,7 +348,7 @@ namespace SpeckleRevit.UI
     {
       //var units = ( ( string ) stream.BaseProperties.units ).ToLower();
       // TODO: Check unit scales properly
-      switch (units)
+      switch (units.ToLowerInvariant())
       {
         case "kilometers":
           return 3.2808399 * 1000;
@@ -355,6 +375,9 @@ namespace SpeckleRevit.UI
           return 3.2808399;
       };
     }
+
+
+
   }
 
 }
