@@ -27,7 +27,7 @@ The dream we've all been waiting for.
 
 These instructions might be incomplete. By all means, do submit a PR if something is wrong. 
 
-**Step 1:** Clone this repository, with its submodules. The solution file you're looking for is *SpeckleRevitWithElements*.
+**Step 1:** Clone this repository, with its submodules. The solution file you're looking for is *SpeckleRevit*.
 
 **Step 2:** Fix broken project references. Most likely, you will need to initialise the sumbodules in `SpeckleElements` separately.
 
