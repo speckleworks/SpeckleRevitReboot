@@ -27,7 +27,7 @@ The dream we've all been waiting for.
 
 These instructions might be incomplete. By all means, do submit a PR if something is wrong. 
 
-**Step 1:** Clone this repository, with its submodules. The solution file you're looking for is *SpeckleRevitWithElements*.
+**Step 1:** Clone this repository, with its submodules. The solution file you're looking for is *SpeckleRevit*.
 
 **Step 2:** Fix broken project references. Most likely, you will need to initialise the sumbodules in `SpeckleElements` separately.
 
@@ -37,9 +37,9 @@ These instructions might be incomplete. By all means, do submit a PR if somethin
 
 If you have installed speckle before, you can get away without building SpeckleCoreGeometry by just copy pasting it from the `%localappdata%/SpeckleKits` folder in the `%localappdata%/SpeckleKitsDebug` folder.
 
-**Step 3:** Start a development server for the [ui app](https://github.com/speckleworks/SpeckleUi). 
+**Step 3:** Start a development server for the [ui app](https://github.com/speckleworks/SpeckleUiApp). 
 
-If it's the first time you're doing this, this means running first `npm install` and then `npm run serve` (obviously, you will need node and npm installed first, as well as python). If things workded out fine, you'll be able to see something in your browser at `localhost:8000`. 
+If it's the first time you're doing this, this means running first `npm install` and then `npm run serve` (obviously, you will need node and npm installed first, as well as python). If things worked out fine, you'll be able to see something in your browser at `localhost:8000`. 
 
 **Step 4:** Start debugging! This should launch Revit 2019 after a successful build. If you see the speckle plugin and its folder in `C:\Users\[your name]\AppData\Roaming\Autodesk\Revit\Addins\2019` you've probably nailed it. 
 
