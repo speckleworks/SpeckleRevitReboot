@@ -37,7 +37,7 @@ These instructions might be incomplete. By all means, do submit a PR if somethin
 
 If you have installed speckle before, you can get away without building SpeckleCoreGeometry by just copy pasting it from the `%localappdata%/SpeckleKits` folder in the `%localappdata%/SpeckleKitsDebug` folder.
 
-**Step 3:** Start a development server for the [ui app](https://github.com/speckleworks/SpeckleUi). 
+**Step 3:** Start a development server for the [ui app](https://github.com/speckleworks/SpeckleUiApp). 
 
 If it's the first time you're doing this, this means running first `npm install` and then `npm run serve` (obviously, you will need node and npm installed first, as well as python). If things workded out fine, you'll be able to see something in your browser at `localhost:8000`. 
 
