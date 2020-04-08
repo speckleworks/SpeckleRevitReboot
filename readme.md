@@ -114,7 +114,7 @@ I am increasingly of the opinion that users should manually select objects from 
 
 Having said that, the user has now the option to filter the selected elements based on their parameters and operators:
 
-![Filter](https://pbs.twimg.com/tweet_video_thumb/EFyYnNMXUAA1E3v?format=jpg&name=small)
+![Filter](https://video.twimg.com/tweet_video/EFyYnNMXUAA1E3v.mp4)
 
 Previous thoughts on this matter include:
 
