@@ -4,7 +4,7 @@
 
 The dream we've all been waiting for. 
 
-![brevit](https://user-images.githubusercontent.com/7696515/58039037-7fd43500-7b29-11e9-9d72-f09733ede653.PNG)
+![Example](https://user-images.githubusercontent.com/7696515/58039037-7fd43500-7b29-11e9-9d72-f09733ede653.PNG)
 
 
 ## Current Project State:
@@ -12,12 +12,13 @@ The dream we've all been waiting for.
 - Can send stuff out of revit.
 - Can receive some stuff in revit, albeit the gh authoring side is not yet released.
 
-> TODO: Add some gifs/imgs.
+![brevit](https://user-images.githubusercontent.com/7696515/58039037-7fd43500-7b29-11e9-9d72-f09733ede653.PNG)https://speckle.systems/_nuxt/img/0d27232.gif)
 
 ## Project Structure
 
 - `SpeckleRevit` - the main beast containing the interaction logic with Revit; implements and expands on the `SpeckleUiBindings` (see below). 
 - `SpeckleUiBase` - submodule, the base ui. a cefsharp based app. see notes [here](https://github.com/speckleworks/SpeckleUi).
+- `SpeckleUiApp` - 
 - `SpeckleCore` - the one and only .NET SDK for Speckle. 
 - `SpeckleElements` - a rather basic object model (a speckle kit!) to faciliate getting data in and out of Revit. This is not a hard dependency, but in order for things to work you need something. 
 
@@ -50,13 +51,33 @@ If it's the first time you're doing this, this means running first `npm install`
 
 ### Local State & Clients Serialisation
 
+SpeckleRevit references SpeckleCore.
+
+When deserializing a stream SpeckleCore uses reflection to load the kits in %localappdata% 
+
+If it finds a kit capable to convert objects from speckle types to the native Revit types that's being used.
+
 Every time a stream is baked, this is reflected and stored in a local state that is serialised within the revit document itself. Same goes for clients. 
 
 The local state is injected in any kits that can accept it (and work with it - ideally all). 
 
+If you're planning on adding a new SpeckleElement type and relative conversions you should:
+- create a new data structure in SpeckleElementClasses\Base
+- create the corresponding conversion routines in SpeckleElementsRevit\ConversionRoutines\
+
 ### CEFSharp version
 
-Dynamo and/or Revit 2019 ships with cefsharp too, hence we need to maintain feature parity with its version (57). Do not use newer versions of cefsharp!
+Dynamo and/or Revit ships with cefsharp too, hence we need to maintain feature parity with its version. 
+
+Do not use newer versions of cefsharp!
+
+Revit 2019 uses CEFsharp version 57.0.0 
+
+Revit 2020 uses CEFsharp version 65.0.1
+
+Three cheers for autodesk!
+
+More info here: https://forums.autodesk.com/t5/revit-api-forum/how-to-safely-build-addins-that-use-cefsharp-for-multiple-revit/td-p/8749239
 
 ### UIBindings class 
 
@@ -90,6 +111,10 @@ let accounts = JSON.parse( res )
 ### Selecting things for sending
 
 I am increasingly of the opinion that users should manually select objects from the host application that they want to send, and use the host application's filtering mehtods to refine the selection to match their intent.
+
+Having said that, the user has now the option to filter the selected elements based on their parameters and operators:
+
+![Filter](https://pbs.twimg.com/tweet_video_thumb/EFyYnNMXUAA1E3v?format=jpg&name=small)
 
 Previous thoughts on this matter include:
 
