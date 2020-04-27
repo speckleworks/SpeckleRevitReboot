@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2019|x64'">
     <RevitVersion>2019</RevitVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug2019\</OutputPath>
+    <OutputPath>bin\Release2019\</OutputPath>
     <DefineConstants>TRACE;RELEASE;Version2019</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -100,7 +100,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2020|x64'">
     <RevitVersion>2020</RevitVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug2020\</OutputPath>
+    <OutputPath>bin\Release2020\</OutputPath>
     <DefineConstants>TRACE;RELEASE;Version2020</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -127,7 +127,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2021|x64'">
     <RevitVersion>2021</RevitVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug2021\</OutputPath>
+    <OutputPath>bin\Release2021\</OutputPath>
     <DefineConstants>TRACE;RELEASE;Version2021</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
