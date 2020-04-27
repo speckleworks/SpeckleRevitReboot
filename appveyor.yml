@@ -1,24 +1,34 @@
 version: '{build}'
-image: Visual Studio 2017
-configuration: Release
+image: Visual Studio 2019
+configuration: 
+  - Release2019
+  - Release2020
+  - Release2021
+platform:
+  - x64
+
 cache:
   - '%LocalAppData%\NuGet\v3-cache'
 
+#only set vesion for first build
 init:
   - ps: |
-      If($Env:APPVEYOR_REPO_TAG -eq "true")
+      If($Env:CONFIGURATION -eq "Release2019")
       {
-        Write-Host "We now have a tagged release. Proper."
-        Write-Host "Tag is $Env:APPVEYOR_REPO_TAG_NAME"
-        $env:APPVEYOR_BUILD_VERSION=$env:APPVEYOR_REPO_TAG_NAME
-        Update-AppveyorBuild -Version "$Env:APPVEYOR_REPO_TAG_NAME"
-      }
-      else
-      {
-        $releases = "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases"
-        $tag = (Invoke-WebRequest $releases | ConvertFrom-Json)[0].tag_name
-        $spl = $tag.Split("-")[0]
-        Update-AppveyorBuild -Version "$spl.$Env:APPVEYOR_BUILD_VERSION-wip"
+        If($Env:APPVEYOR_REPO_TAG -eq "true")
+        {
+          Write-Host "We now have a tagged release. Proper."
+          Write-Host "Tag is $Env:APPVEYOR_REPO_TAG_NAME"
+          $env:APPVEYOR_BUILD_VERSION=$env:APPVEYOR_REPO_TAG_NAME
+          Update-AppveyorBuild -Version "$Env:APPVEYOR_REPO_TAG_NAME"
+        }
+        else
+        {
+          $releases = "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases"
+          $tag = (Invoke-WebRequest $releases | ConvertFrom-Json)[0].tag_name
+          $spl = $tag.Split("-")[0]
+          Update-AppveyorBuild -Version "$spl.$Env:APPVEYOR_BUILD_VERSION-wip"
+        }
       }
       Write-Host "Hello. Build version for Speckle Revit is: $Env:APPVEYOR_BUILD_VERSION"
 
@@ -34,16 +44,16 @@ assembly_info:
 
 before_build:
   - nuget restore SpeckleRevit.sln
-  - mkdir Release
+  #- mkdir Release
   # maybe needed for local build events to go through
-  - mkdir %localappdata%\Autodesk\REVIT\Addins\2019
+  #- mkdir %localappdata%\Autodesk\REVIT\Addins\2019
 
 build:
   project: SpeckleRevit.sln
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\Release\*"
+  - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\SpeckleRevitReboot\bin\%CONFIGURATION%\*"
 
 artifacts:
   path: SpeckleRevit.zip
@@ -56,7 +66,7 @@ deploy:
     provider: GitHub
     auth_token:
       secure: D5tPFvdQMg9sIe0sSvQjEWw4KAdOk1jyxNwiH5qP5DpDmUH6n6NgTdA+56vXS1Pe # your encrypted token from GitHub
-    artifact: release
+    artifact: release 
     #draft: false
     #prerelease: false
     force_update: true
