@@ -13,23 +13,23 @@ cache:
 init:
   - ps: |
 #only set vesion for first build
-    If($Env:CONFIGURATION -eq "Release2019")
-    {
-      If($Env:APPVEYOR_REPO_TAG -eq "true")
+      If($Env:CONFIGURATION -eq "Release2019")
       {
-        Write-Host "We now have a tagged release. Proper."
-        Write-Host "Tag is $Env:APPVEYOR_REPO_TAG_NAME"
-        $env:APPVEYOR_BUILD_VERSION=$env:APPVEYOR_REPO_TAG_NAME
-        Update-AppveyorBuild -Version "$Env:APPVEYOR_REPO_TAG_NAME"
+        If($Env:APPVEYOR_REPO_TAG -eq "true")
+        {
+          Write-Host "We now have a tagged release. Proper."
+          Write-Host "Tag is $Env:APPVEYOR_REPO_TAG_NAME"
+          $env:APPVEYOR_BUILD_VERSION=$env:APPVEYOR_REPO_TAG_NAME
+          Update-AppveyorBuild -Version "$Env:APPVEYOR_REPO_TAG_NAME"
+        }
+        else
+        {
+          $releases = "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases"
+          $tag = (Invoke-WebRequest $releases | ConvertFrom-Json)[0].tag_name
+          $spl = $tag.Split("-")[0]
+          Update-AppveyorBuild -Version "$spl.$Env:APPVEYOR_BUILD_VERSION-wip"
+        }
       }
-      else
-      {
-        $releases = "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases"
-        $tag = (Invoke-WebRequest $releases | ConvertFrom-Json)[0].tag_name
-        $spl = $tag.Split("-")[0]
-        Update-AppveyorBuild -Version "$spl.$Env:APPVEYOR_BUILD_VERSION-wip"
-      }
-    }
       Write-Host "Hello. Build version for Speckle Revit is: $Env:APPVEYOR_BUILD_VERSION"
 
 install:
