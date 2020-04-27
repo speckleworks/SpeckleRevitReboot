@@ -12,9 +12,9 @@ cache:
 
 init:
   - ps: |
-      Write-Host "Job id: $Env:APPVEYOR_JOB_ID"
-      Write-Host "Build number: $Env:APPVEYOR_BUILD_NUMBER"
-      Write-Host "PLatform: $Env:PLATFORM"
+#only set vesion for first build
+    If($Env:CONFIGURATION -eq "Release2019")
+    {
       If($Env:APPVEYOR_REPO_TAG -eq "true")
       {
         Write-Host "We now have a tagged release. Proper."
@@ -29,6 +29,7 @@ init:
         $spl = $tag.Split("-")[0]
         Update-AppveyorBuild -Version "$spl.$Env:APPVEYOR_BUILD_VERSION-wip"
       }
+    }
       Write-Host "Hello. Build version for Speckle Revit is: $Env:APPVEYOR_BUILD_VERSION"
 
 install:
