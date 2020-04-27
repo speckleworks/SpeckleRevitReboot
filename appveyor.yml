@@ -4,6 +4,8 @@ configuration:
   - Release2019
   - Release2020
   - Release2021
+platform:
+  - x64
 
 cache:
   - '%LocalAppData%\NuGet\v3-cache'
