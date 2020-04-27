@@ -12,6 +12,9 @@ cache:
 
 init:
   - ps: |
+      Write-Host "Job id: $Env:APPVEYOR_JOB_ID"
+      Write-Host "Build number: $Env:APPVEYOR_BUILD_NUMBER"
+      Write-Host "PLatform: $Env:PLATFORM"
       If($Env:APPVEYOR_REPO_TAG -eq "true")
       {
         Write-Host "We now have a tagged release. Proper."
