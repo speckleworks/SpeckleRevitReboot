@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.props" Condition="Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.props')" />
-  <Import Project="..\packages\CefSharp.Common.57.0.0\build\CefSharp.Common.props" Condition="Exists('..\packages\CefSharp.Common.57.0.0\build\CefSharp.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -19,7 +17,7 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <!--<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -37,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
+  </PropertyGroup>-->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
@@ -56,30 +54,98 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugParallels|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugParallels|x64'">
-    <OutputPath>bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLocalUi|AnyCPU'">
+ 
+
+
+  <!-- MULTI VERSION CONFIGURATION START -->
+  <!-- ADDING BUILD COFIGURATION FOR EACH YEAR, DEBUG AND RELEASE -->
+
+
+  <!-- 2019 -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2019|x64'">
+    <RevitVersion>2019</RevitVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;DEBUGLOCAL</DefineConstants>
+    <OutputPath>bin\Debug2019\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;Version2019</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files\Autodesk\Revit 2019\Revit.exe</StartProgram>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLocalUi|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2019|x64'">
+    <RevitVersion>2019</RevitVersion>
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUGLOCAL</DefineConstants>
+    <OutputPath>bin\Debug2019\</OutputPath>
+    <DefineConstants>TRACE;RELEASE;Version2019</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <!-- 2020 -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|x64'">
+    <RevitVersion>2020</RevitVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug2020\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;Version2020</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files\Autodesk\Revit 2020\Revit.exe</StartProgram>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2020|x64'">
+    <RevitVersion>2020</RevitVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug2020\</OutputPath>
+    <DefineConstants>TRACE;RELEASE;Version2020</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <!-- 2021 -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2021|x64'">
+    <RevitVersion>2021</RevitVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug2021\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;Version2021</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files\Autodesk\Revit 2021\Revit.exe</StartProgram>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2021|x64'">
+    <RevitVersion>2021</RevitVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug2021\</OutputPath>
+    <DefineConstants>TRACE;RELEASE;Version2021</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+  
+  
   <ItemGroup>
     <Reference Include="Countly, Version=19.8.0.0, Culture=neutral, PublicKeyToken=30fd2b3d8bfe4882, processorArchitecture=MSIL">
       <HintPath>..\packages\Countly.19.8.0\lib\net40-client\Countly.dll</HintPath>
@@ -195,17 +261,18 @@
     <Copy SourceFiles="$(SolutionDir)SpeckleUi\App\dist\index.html" DestinationFolder="$(TargetDir)\app" />
     <Copy SourceFiles="$(SolutionDir)SpeckleUi\App\dist\js\*.js" DestinationFolder="$(TargetDir)\app\dist\js" />
   </Target> -->
-  <Target Name="BeforeBuild">
+  <!--<Target Name="BeforeBuild">
     <MakeDir Directories="$(SolutionDir)\$(ConfigurationName)\app" />
     <ItemGroup>
       <WebApp Include="$(SolutionDir)SpeckleUi\App\dist\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(WebApp)" DestinationFolder="$(SolutionDir)\$(ConfigurationName)\app\%(RecursiveDir)" />
-  </Target>
-  <!-- End Web app copy -->
-  <Target Name="AfterBuild">
-    <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit" />
-    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\2019" />
+  </Target>-->
+
+  
+  <!--<Target Name="AfterBuild">
+    <MakeDir Directories="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\SpeckleRevit" />
+    <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)" />
     <Copy SourceFiles="$(ProjectDir)SpeckleRevit.addin" DestinationFolder="$(SolutionDir)\$(ConfigurationName)" />
     <ItemGroup>
       <MySourceFiles Include="$(ProjectDir)bin\$(ConfigurationName)\**\*.*" />
@@ -219,11 +286,45 @@
     <Copy SourceFiles="@(AllMySourceFiles)" DestinationFiles="@(AllMySourceFiles->'$(AppData)\Autodesk\REVIT\Addins\2019\SpeckleRevit\%(RecursiveDir)%(Filename)%(Extension)')">
       <Output TaskParameter="CopiedFiles" ItemName="SuccessfullyCopiedFiles" />
     </Copy>
+  </Target>-->
+
+  <!-- MULTIVERSION POST BUILD EVENTS START -->
+  <!-- COPIES ALL DLLS AND .ADDIN MANIFEST TO THE RELATIVE REVIT ADDIN FOLDER -->
+  <Target Name="AfterBuild">
+    <CallTarget Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Debug2019'" Targets="AfterBuildDebug" />
   </Target>
-  <Import Project="..\packages\cef.redist.x64.3.2987.1601\build\cef.redist.x64.targets" Condition="Exists('..\packages\cef.redist.x64.3.2987.1601\build\cef.redist.x64.targets')" />
-  <Import Project="..\packages\cef.redist.x86.3.2987.1601\build\cef.redist.x86.targets" Condition="Exists('..\packages\cef.redist.x86.3.2987.1601\build\cef.redist.x86.targets')" />
-  <Import Project="..\packages\CefSharp.Common.57.0.0\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.57.0.0\build\CefSharp.Common.targets')" />
+  <Target Name="AfterBuildDebug">
+    <ItemGroup>
+      <SourceDLLs Include="$(TargetDir)*.dll" />
+      <SourceManifest Include="$(TargetDir)*.addin" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SourceDLLs)" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(SourceManifest)" DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\" />
+  </Target>
+  <!-- MULTIVERSION POST BUILD EVENTS END -->
+
+
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
+  <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
+  <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  
+  
+<!--CEF 2019-->
+  <Import Project="..\packages\CefSharp.Common.57.0.0\build\CefSharp.Common.targets" Condition="('$(Configuration)' == 'Release2019' Or '$(Configuration)' == 'Debug2019') And Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets')" />
+  <Import Project="..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets" Condition="('$(Configuration)' == 'Release2019' Or '$(Configuration)' == 'Debug2019')  And Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets')" />
+
+  <!--CEF 2020-->
+  <Import Project="..\packages\CefSharp.Common.65.0.1\build\CefSharp.Common.targets" Condition="('$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Debug2020')  And Exists('..\packages\CefSharp.Common.65.0.1\build\CefSharp.Common.targets')" />
+  <Import Project="..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets" Condition="('$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Debug2020')  And Exists('..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets')" />
+
+  <!--CEF 2021-->
+  <Import Project="..\packages\CefSharp.Common.65.0.1\build\CefSharp.Common.targets" Condition="('$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Debug2021')  And Exists('..\packages\CefSharp.Common.65.0.1\build\CefSharp.Common.targets')" />
+  <Import Project="..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets" Condition="('$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Debug2021')  And Exists('..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets')" />
+
+
+
+
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
@@ -231,12 +332,19 @@
     <Error Condition="!Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets'))" />
     <Error Condition="!Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets'))" />
     <Error Condition="!Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets'))" />
-    <Error Condition="!Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.props'))" />
-    <Error Condition="!Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+
+    <!--CEF 2019-->
+    <Error Condition="('$(Configuration)' == 'Release2019' Or '$(Configuration)' == 'Debug2019') And !Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.props'))" />
+    <Error Condition="('$(Configuration)' == 'Release2019' Or '$(Configuration)' == 'Debug2019') And !Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets'))" />
+
+    <!--CEF 2019-->
+    <Error Condition="('$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Debug2020') And !Exists('..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.props'))" />
+    <Error Condition="('$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Debug2020') And !Exists('..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets'))" />
+
+    <!--CEF 2019-->
+    <Error Condition="('$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Debug2021') And !Exists('..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.props'))" />
+    <Error Condition="('$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Debug2021') And !Exists('..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.65.0.1\build\CefSharp.Wpf.targets'))" />
   </Target>
-  <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
-  <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.11\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
-  <Import Project="..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets" Condition="Exists('..\packages\CefSharp.Wpf.57.0.0\build\CefSharp.Wpf.targets')" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+
 </Project>
