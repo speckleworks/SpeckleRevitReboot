@@ -53,10 +53,10 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a Speckle$Env:APPVEYOR_BUILD_VERSION.zip "%APPVEYOR_BUILD_FOLDER%\SpeckleRevitReboot\bin\$Env:APPVEYOR_BUILD_VERSION\*"
+  - 7z a Speckle$Env:CONFIGURATION.zip "%APPVEYOR_BUILD_FOLDER%\SpeckleRevitReboot\bin\%CONFIGURATION%\*"
 
 artifacts:
-  path: Speckle$Env:APPVEYOR_BUILD_VERSION.zip
+  path: Speckle$Env:CONFIGURATION.zip
   name: Release
 
 deploy:
