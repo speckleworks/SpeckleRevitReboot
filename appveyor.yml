@@ -44,7 +44,7 @@ assembly_info:
 
 before_build:
   - nuget restore SpeckleRevit.sln
-  - mkdir Release
+  #- mkdir Release
   # maybe needed for local build events to go through
   #- mkdir %localappdata%\Autodesk\REVIT\Addins\2019
 
@@ -53,10 +53,10 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\*"
+  - 7z a Speckle$Env:APPVEYOR_BUILD_VERSION.zip "%APPVEYOR_BUILD_FOLDER%\SpeckleRevitReboot\bin\$Env:APPVEYOR_BUILD_VERSION\*"
 
 artifacts:
-  path: SpeckleRevit.zip
+  path: Speckle$Env:APPVEYOR_BUILD_VERSION.zip
   name: Release
 
 deploy:
@@ -66,7 +66,7 @@ deploy:
     provider: GitHub
     auth_token:
       secure: D5tPFvdQMg9sIe0sSvQjEWw4KAdOk1jyxNwiH5qP5DpDmUH6n6NgTdA+56vXS1Pe # your encrypted token from GitHub
-    artifact: release
+    artifact: /.*\.zip/ 
     #draft: false
     #prerelease: false
     force_update: true
