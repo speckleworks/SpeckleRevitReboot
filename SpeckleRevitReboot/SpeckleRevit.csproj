@@ -173,6 +173,7 @@
     <EmbeddedResource Include="Assets\speckle32.png" />
     <Content Include="SpeckleRevit.addin">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
