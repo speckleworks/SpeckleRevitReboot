@@ -10,9 +10,9 @@ platform:
 cache:
   - '%LocalAppData%\NuGet\v3-cache'
 
+#only set vesion for first build
 init:
   - ps: |
-#only set vesion for first build
       If($Env:CONFIGURATION -eq "Release2019")
       {
         If($Env:APPVEYOR_REPO_TAG -eq "true")
