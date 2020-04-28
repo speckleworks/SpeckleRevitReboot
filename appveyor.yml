@@ -44,7 +44,7 @@ assembly_info:
 
 before_build:
   - nuget restore SpeckleRevit.sln
-  #- mkdir Release
+  - mkdir Release\%CONFIGURATION%\
   # maybe needed for local build events to go through
   #- mkdir %localappdata%\Autodesk\REVIT\Addins\2019
 
@@ -53,7 +53,7 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
+  - 7z a SpeckleRevit.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\"
 
 artifacts:
   path: SpeckleRevit.zip
