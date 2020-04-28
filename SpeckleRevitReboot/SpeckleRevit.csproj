@@ -205,6 +205,7 @@
 		<Copy DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\" SourceFiles="@(SourceManifest)"/>
 	</Target>
 	<Target Name="AfterBuildRelease">
+		<Message Importance="High" Text="RELEASE copy from $(TargetDir) to $(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\" />
 		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)"/>
 		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\" SourceFiles="@(SourceManifest)"/>
 	</Target>
