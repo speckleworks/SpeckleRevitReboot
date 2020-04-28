@@ -197,7 +197,7 @@
 		<CallTarget Condition="'$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Release2019'" Targets="AfterBuildRelease"/>
 	</Target>
 	<ItemGroup>
-		<SourceDLLs Include="$(TargetDir)*.dll"/>
+		<SourceDLLs Include="$(TargetDir)\**\*.*"/>
 		<SourceManifest Include="$(ProjectDir)*.addin"/>
 	</ItemGroup>
 	<Target Name="AfterBuildDebug">
@@ -206,6 +206,7 @@
 	</Target>
 	<Target Name="AfterBuildRelease">
 		<Message Importance="High" Text="RELEASE copy from $(TargetDir) to $(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\" />
+		<Message Text="%(SourceDLLs.FullPath)"/>
 		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)"/>
 		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\" SourceFiles="@(SourceManifest)"/>
 	</Target>
