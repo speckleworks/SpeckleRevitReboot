@@ -50,7 +50,7 @@ before_build:
 
 build:
   project: SpeckleRevit.sln
-  verbosity: minimal
+  verbosity: detailed
 
 after_build:
   - 7z a SpeckleRevit.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\"

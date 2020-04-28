@@ -197,7 +197,7 @@
 		<CallTarget Condition="'$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Release2019'" Targets="AfterBuildRelease"/>
 	</Target>
 	<ItemGroup>
-		<SourceDLLs Exclude="RevitAPI.dll;RevitAPIUI.dll" Include="$(TargetDir)*.dll"/>
+		<SourceDLLs Include="$(TargetDir)*.dll"/>
 		<SourceManifest Include="$(ProjectDir)*.addin"/>
 	</ItemGroup>
 	<Target Name="AfterBuildDebug">
