@@ -53,7 +53,7 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\SpeckleRevitReboot\bin\%CONFIGURATION%\*"
+  - 7z a SpeckleRevit.zip "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
 
 artifacts:
   path: SpeckleRevit.zip
