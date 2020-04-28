@@ -210,9 +210,7 @@
 			<SourceManifest Include="$(ProjectDir)*.addin"/>
 		</ItemGroup>
 		<Message Importance="High" Text="RELEASE copy from $(TargetDir) to $(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\"/>
-		<Copy DestinationFiles="@(SourceDLLs-&gt;'$(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\%(RecursiveDir)%(Filename)%(Extension)')" SourceFiles="@(SourceDLLs)">
-			<Output ItemName="SuccessfullyCopiedFiles" TaskParameter="CopiedFiles"/>
-		</Copy>
+		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)"/>
 		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\" SourceFiles="@(SourceManifest)"/>
 	</Target>
 </Project>
