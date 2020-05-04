@@ -13,6 +13,8 @@ cache:
 #only set vesion for first build
 init:
   - ps: |
+      $version = $Env:CONFIGURATION
+      $env:REVIT_VERSION=$version.replace("Release","")
       If($Env:CONFIGURATION -eq "Release2019")
       {
         If($Env:APPVEYOR_REPO_TAG -eq "true")
@@ -31,7 +33,7 @@ init:
         }
       }
       Write-Host "Hello. Build version for Speckle Revit is: $Env:APPVEYOR_BUILD_VERSION"
-
+ 
 install:
   # init and update submodules
   - git submodule update --recursive --init
@@ -53,10 +55,10 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
+  - 7z a SpeckleRevit%REVIT_VERSION%.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
 
 artifacts:
-  path: SpeckleRevit.zip
+  path: SpeckleRevit%REVIT_VERSION%.zip
   name: Release
 
 deploy:
