@@ -13,6 +13,8 @@ cache:
 #only set vesion for first build
 init:
   - ps: |
+      $version = $Env:CONFIGURATION
+      $version.replace("Release","")
       If($Env:CONFIGURATION -eq "Release2019")
       {
         If($Env:APPVEYOR_REPO_TAG -eq "true")
@@ -53,10 +55,10 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
+  - 7z a SpeckleRevit$(version).zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
 
 artifacts:
-  path: SpeckleRevit.zip
+  path: SpeckleRevit$(version).zip
   name: Release
 
 deploy:
