@@ -14,8 +14,7 @@ cache:
 init:
   - ps: |
       $version = $Env:CONFIGURATION
-      $version.replace("Release","")
-      $env:REVIT_VERSION=$version
+      $env:REVIT_VERSION=$version.replace("Release","")
       If($Env:CONFIGURATION -eq "Release2019")
       {
         If($Env:APPVEYOR_REPO_TAG -eq "true")
@@ -34,7 +33,7 @@ init:
         }
       }
       Write-Host "Hello. Build version for Speckle Revit is: $Env:APPVEYOR_BUILD_VERSION"
-
+ 
 install:
   # init and update submodules
   - git submodule update --recursive --init
