@@ -15,6 +15,7 @@ init:
   - ps: |
       $version = $Env:CONFIGURATION
       $version.replace("Release","")
+      $env:REVIT_VERSION=$version
       If($Env:CONFIGURATION -eq "Release2019")
       {
         If($Env:APPVEYOR_REPO_TAG -eq "true")
@@ -55,10 +56,10 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit$(version).zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
+  - 7z a SpeckleRevit%REVIT_VERSION%.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
 
 artifacts:
-  path: SpeckleRevit$(version).zip
+  path: SpeckleRevit%REVIT_VERSION%.zip
   name: Release
 
 deploy:
