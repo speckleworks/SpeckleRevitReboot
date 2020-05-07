@@ -55,10 +55,10 @@ build:
   verbosity: minimal
 
 after_build:
-  - 7z a SpeckleRevit%REVIT_VERSION%.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
+  - 7z a SpeckleRevit%REVIT_VERSION%-%APPVEYOR_BUILD_VERSION%.zip -r "%APPVEYOR_BUILD_FOLDER%\Release\%CONFIGURATION%\*"
 
 artifacts:
-  path: SpeckleRevit%REVIT_VERSION%.zip
+  path: SpeckleRevit%REVIT_VERSION%-%APPVEYOR_BUILD_VERSION%.zip
   name: Release
 
 deploy:
