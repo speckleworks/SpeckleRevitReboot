@@ -16,6 +16,8 @@ namespace SpeckleRevit.UI
 {
   public partial class SpeckleUiBindingsRevit
   {
+    private int objectCreateTimeout = 10000; //Milliseconds
+
     public override void AddSender(string args)
     {
       var client = JsonConvert.DeserializeObject<dynamic>(args);
@@ -153,7 +155,7 @@ namespace SpeckleRevit.UI
 
             try
             {
-              var chunkResponse = apiClient.ObjectCreateAsync(convertedObjects).Result.Resources;
+              var chunkResponse = apiClient.ObjectCreateAsync(convertedObjects, objectCreateTimeout).Result.Resources;
               int m = 0;
               foreach (var objConverted in convertedObjects)
               {
