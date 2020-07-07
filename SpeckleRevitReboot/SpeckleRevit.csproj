@@ -1,200 +1,201 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4937638C-8A51-4F50-9BD2-E7F7AC28DD01}</ProjectGuid>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpeckleRevit</RootNamespace>
-    <AssemblyName>SpeckleRevit</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp />
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <!--<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' "><DebugSymbols>true</DebugSymbols><DebugType>full</DebugType><Optimize>false</Optimize><OutputPath>bin\Debug\</OutputPath><DefineConstants>DEBUG;TRACE</DefineConstants><ErrorReport>prompt</ErrorReport><WarningLevel>4</WarningLevel><PlatformTarget>x64</PlatformTarget></PropertyGroup><PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' "><DebugType>pdbonly</DebugType><Optimize>true</Optimize><OutputPath>bin\Release\</OutputPath><DefineConstants>TRACE</DefineConstants><ErrorReport>prompt</ErrorReport><WarningLevel>4</WarningLevel><PlatformTarget>x64</PlatformTarget></PropertyGroup>-->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <!-- MULTI VERSION CONFIGURATION START -->
-  <!-- ADDING BUILD COFIGURATION FOR EACH YEAR, DEBUG AND RELEASE -->
-  <!-- 2019 -->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2019|x64'">
-    <RevitVersion>2019</RevitVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug2019\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;Version2019</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\Autodesk\Revit 2019\Revit.exe</StartProgram>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2019|x64'">
-    <RevitVersion>2019</RevitVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release2019\</OutputPath>
-    <DefineConstants>TRACE;RELEASE;Version2019</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>0</WarningLevel>
-  </PropertyGroup>
-  <!-- 2020 -->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|x64'">
-    <RevitVersion>2020</RevitVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug2020\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;Version2020</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\Autodesk\Revit 2020\Revit.exe</StartProgram>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2020|x64'">
-    <RevitVersion>2020</RevitVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release2020\</OutputPath>
-    <DefineConstants>TRACE;RELEASE;Version2020</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>0</WarningLevel>
-  </PropertyGroup>
-  <!-- 2021 -->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2021|x64'">
-    <RevitVersion>2021</RevitVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug2021\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;Version2021</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\Autodesk\Revit 2021\Revit.exe</StartProgram>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2021|x64'">
-    <RevitVersion>2021</RevitVersion>
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release2021\</OutputPath>
-    <DefineConstants>TRACE;RELEASE;Version2021</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>0</WarningLevel>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ErrorEater.cs" />
-    <Compile Include="Globals.cs" />
-    <Compile Include="SpeckleProgressBar.xaml.cs">
-      <DependentUpon>SpeckleProgressBar.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Storage\HelperClasses.cs" />
-    <Compile Include="Storage\SpeckleClientsStorage.cs" />
-    <Compile Include="Entry.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Storage\SpeckleStateStorage.cs" />
-    <Compile Include="UI\Receiver.cs" />
-    <Compile Include="UI\Sender.cs" />
-    <Compile Include="UI\SpeckleUiBindings.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\speckle16.png" />
-    <EmbeddedResource Include="Assets\speckle32.png" />
-    <Content Include="SpeckleRevit.addin">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="SpeckleProgressBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <!-- SWITCH REVIT NUGETS -->
+	<Import Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ProjectGuid>{4937638C-8A51-4F50-9BD2-E7F7AC28DD01}</ProjectGuid>
+		<ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>SpeckleRevit</RootNamespace>
+		<AssemblyName>SpeckleRevit</AssemblyName>
+		<TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+		<FileAlignment>512</FileAlignment>
+		<Deterministic>true</Deterministic>
+		<NuGetPackageImportStamp/>
+		<TargetFrameworkProfile/>
+	</PropertyGroup>
+	<!--<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' "><DebugSymbols>true</DebugSymbols><DebugType>full</DebugType><Optimize>false</Optimize><OutputPath>bin\Debug\</OutputPath><DefineConstants>DEBUG;TRACE</DefineConstants><ErrorReport>prompt</ErrorReport><WarningLevel>4</WarningLevel><PlatformTarget>x64</PlatformTarget></PropertyGroup><PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' "><DebugType>pdbonly</DebugType><Optimize>true</Optimize><OutputPath>bin\Release\</OutputPath><DefineConstants>TRACE</DefineConstants><ErrorReport>prompt</ErrorReport><WarningLevel>4</WarningLevel><PlatformTarget>x64</PlatformTarget></PropertyGroup>-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Debug\</OutputPath>
+		<DefineConstants>TRACE;DEBUG</DefineConstants>
+		<DebugType>full</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+		<OutputPath>bin\Release\</OutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<Optimize>true</Optimize>
+		<DebugType>pdbonly</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+	<!-- MULTI VERSION CONFIGURATION START -->
+	<!-- ADDING BUILD COFIGURATION FOR EACH YEAR, DEBUG AND RELEASE -->
+	<!-- 2019 -->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2019|x64'">
+		<RevitVersion>2019</RevitVersion>
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Debug2019\</OutputPath>
+		<DefineConstants>DEBUG;TRACE;Version2019</DefineConstants>
+		<DebugType>full</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>7.3</LangVersion>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+		<StartAction>Program</StartAction>
+		<StartProgram>C:\Program Files\Autodesk\Revit 2019\Revit.exe</StartProgram>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2019|x64'">
+		<RevitVersion>2019</RevitVersion>
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Release2019\</OutputPath>
+		<DefineConstants>TRACE;RELEASE;Version2019</DefineConstants>
+		<Optimize>true</Optimize>
+		<DebugType>pdbonly</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>7.3</LangVersion>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+		<WarningLevel>0</WarningLevel>
+	</PropertyGroup>
+	<!-- 2020 -->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2020|x64'">
+		<RevitVersion>2020</RevitVersion>
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Debug2020\</OutputPath>
+		<DefineConstants>DEBUG;TRACE;Version2020</DefineConstants>
+		<DebugType>full</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>7.3</LangVersion>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+		<StartAction>Program</StartAction>
+		<StartProgram>C:\Program Files\Autodesk\Revit 2020\Revit.exe</StartProgram>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2020|x64'">
+		<RevitVersion>2020</RevitVersion>
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Release2020\</OutputPath>
+		<DefineConstants>TRACE;RELEASE;Version2020</DefineConstants>
+		<Optimize>true</Optimize>
+		<DebugType>pdbonly</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>7.3</LangVersion>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+		<WarningLevel>0</WarningLevel>
+	</PropertyGroup>
+	<!-- 2021 -->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug2021|x64'">
+		<RevitVersion>2021</RevitVersion>
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Debug2021\</OutputPath>
+		<DefineConstants>DEBUG;TRACE;Version2021</DefineConstants>
+		<DebugType>full</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>7.3</LangVersion>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+		<StartAction>Program</StartAction>
+		<StartProgram>C:\Program Files\Autodesk\Revit 2021\Revit.exe</StartProgram>
+		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2021|x64'">
+		<RevitVersion>2021</RevitVersion>
+		<DebugSymbols>true</DebugSymbols>
+		<OutputPath>bin\Release2021\</OutputPath>
+		<DefineConstants>TRACE;RELEASE;Version2021</DefineConstants>
+		<Optimize>true</Optimize>
+		<DebugType>pdbonly</DebugType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>7.3</LangVersion>
+		<ErrorReport>prompt</ErrorReport>
+		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+		<WarningLevel>0</WarningLevel>
+		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="PresentationCore"/>
+		<Reference Include="PresentationFramework"/>
+		<Reference Include="System"/>
+		<Reference Include="System.Core"/>
+		<Reference Include="System.Management"/>
+		<Reference Include="System.Net"/>
+		<Reference Include="System.Xaml"/>
+		<Reference Include="System.Xml.Linq"/>
+		<Reference Include="System.Data.DataSetExtensions"/>
+		<Reference Include="Microsoft.CSharp"/>
+		<Reference Include="System.Data"/>
+		<Reference Include="System.Net.Http"/>
+		<Reference Include="System.Xml"/>
+		<Reference Include="WindowsBase"/>
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="ErrorEater.cs"/>
+		<Compile Include="Globals.cs"/>
+		<Compile Include="SpeckleProgressBar.xaml.cs">
+			<DependentUpon>SpeckleProgressBar.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="Storage\HelperClasses.cs"/>
+		<Compile Include="Storage\SpeckleClientsStorage.cs"/>
+		<Compile Include="Entry.cs"/>
+		<Compile Include="Properties\AssemblyInfo.cs"/>
+		<Compile Include="Storage\SpeckleStateStorage.cs"/>
+		<Compile Include="UI\Receiver.cs"/>
+		<Compile Include="UI\Sender.cs"/>
+		<Compile Include="UI\SpeckleUiBindings.cs"/>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\speckle16.png"/>
+		<EmbeddedResource Include="Assets\speckle32.png"/>
+		<Content Include="SpeckleRevit.addin">
+			<SubType>Designer</SubType>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="app.config"/>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Include="SpeckleProgressBar.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	 <!-- SWITCH REVIT NUGETS -->
   <Choose>
     <When Condition="'$(Configuration)' == 'Debug2019' Or '$(Configuration)' == 'Release2019'">
       <ItemGroup>
         <PackageReference Include="Autodesk.Revit.SDK">
-          <Version>2019.2.2</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
+			<Version>2019.2.2</Version>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
       </ItemGroup>
     </When>
     <When Condition="'$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2020'">
       <ItemGroup>
-        <PackageReference Include="Autodesk.Revit.SDK">
-          <Version>2020.2.1</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
+         <PackageReference Include="Autodesk.Revit.SDK">
+			<Version>2020.2.1</Version>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
       </ItemGroup>
     </When>
-    <When Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">
+        <When Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Release2021'">
       <ItemGroup>
-        <PackageReference Include="Autodesk.Revit.SDK">
-          <Version>2021.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
+         <PackageReference Include="Autodesk.Revit.SDK">
+			<Version>2021.0.0</Version>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
       </ItemGroup>
     </When>
-    <!--  <Otherwise>
+   <!--  <Otherwise>
       <ItemGroup>
         <PackageReference Include="CefSharp.Wpf">
           <Version>79.1.360</Version>
@@ -202,45 +203,46 @@
       </ItemGroup>
     </Otherwise> -->
   </Choose>
-  <ItemGroup>
-    <!--     <PackageReference Include="CefSharp.Wpf" Condition="'$(Configuration)' == 'Release2019' Or '$(Configuration)' == 'Debug2019'"><Version>57.0.0</Version></PackageReference><PackageReference Include="CefSharp.Wpf" Condition="'$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Debug2021'"><Version>65.0.1</Version></PackageReference>-->
-    <!--     <PackageReference Include="Microsoft.Bcl"><Version>1.1.10</Version></PackageReference><PackageReference Include="Microsoft.Bcl.Async"><Version>1.0.168</Version></PackageReference><PackageReference Include="Microsoft.Bcl.Build"><Version>1.0.21</Version></PackageReference>-->
-    <!--     <PackageReference Include="Newtonsoft.Json"><Version>12.0.2</Version></PackageReference>-->
-    <PackageReference Include="SpeckleCore">
-      <Version>1.8.2.456</Version>
-    </PackageReference>
-    <PackageReference Include="SpecklePopup">
-      <Version>1.6.13</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SpeckleUi\SpeckleUiBase\SpeckleUiBase.csproj">
-      <Project>{ce40c576-3b05-443a-a1ba-cb3a796d0084}</Project>
-      <Name>SpeckleUiBase</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- MULTIVERSION POST BUILD EVENTS START -->
-  <!-- COPIES ALL DLLS AND .ADDIN MANIFEST TO THE RELATIVE REVIT ADDIN FOLDER -->
-  <Target Name="AfterBuild">
-    <CallTarget Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Debug2019'" Targets="AfterBuildDebug" />
-    <CallTarget Condition="'$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Release2019'" Targets="AfterBuildRelease" />
-  </Target>
-  <Target Name="AfterBuildDebug">
-    <ItemGroup>
-      <SourceDLLs Include="$(TargetDir)\**\*.*" />
-      <SourceManifest Include="$(ProjectDir)*.addin" />
-    </ItemGroup>
-    <Copy DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)" />
-    <Copy DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\" SourceFiles="@(SourceManifest)" />
-  </Target>
-  <Target Name="AfterBuildRelease">
-    <ItemGroup>
-      <SourceDLLs Include="$(TargetDir)\**\*.*" />
-      <SourceManifest Include="$(ProjectDir)*.addin" />
-    </ItemGroup>
-    <Message Importance="High" Text="RELEASE copy from $(TargetDir) to $(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\" />
-    <Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)" />
-    <Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\" SourceFiles="@(SourceManifest)" />
-  </Target>
+	<ItemGroup>
+		<!--     <PackageReference Include="CefSharp.Wpf" Condition="'$(Configuration)' == 'Release2019' Or '$(Configuration)' == 'Debug2019'"><Version>57.0.0</Version></PackageReference><PackageReference Include="CefSharp.Wpf" Condition="'$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Debug2021'"><Version>65.0.1</Version></PackageReference>-->
+		<!--     <PackageReference Include="Microsoft.Bcl"><Version>1.1.10</Version></PackageReference><PackageReference Include="Microsoft.Bcl.Async"><Version>1.0.168</Version></PackageReference><PackageReference Include="Microsoft.Bcl.Build"><Version>1.0.21</Version></PackageReference>-->
+		<!--     <PackageReference Include="Newtonsoft.Json"><Version>12.0.2</Version></PackageReference>-->
+
+		<PackageReference Include="SpeckleCore">
+			<Version>1.8.0.430</Version>
+		</PackageReference>
+		<PackageReference Include="SpecklePopup">
+			<Version>1.6.13</Version>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SpeckleUi\SpeckleUiBase\SpeckleUiBase.csproj">
+			<Project>{ce40c576-3b05-443a-a1ba-cb3a796d0084}</Project>
+			<Name>SpeckleUiBase</Name>
+		</ProjectReference>
+	</ItemGroup>
+	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+	<!-- MULTIVERSION POST BUILD EVENTS START -->
+	<!-- COPIES ALL DLLS AND .ADDIN MANIFEST TO THE RELATIVE REVIT ADDIN FOLDER -->
+	<Target Name="AfterBuild">
+		<CallTarget Condition="'$(Configuration)' == 'Debug2021' Or '$(Configuration)' == 'Debug2020' Or '$(Configuration)' == 'Debug2019'" Targets="AfterBuildDebug"/>
+		<CallTarget Condition="'$(Configuration)' == 'Release2021' Or '$(Configuration)' == 'Release2020' Or '$(Configuration)' == 'Release2019'" Targets="AfterBuildRelease"/>
+	</Target>
+	<Target Name="AfterBuildDebug">
+		<ItemGroup>
+			<SourceDLLs Include="$(TargetDir)\**\*.*"/>
+			<SourceManifest Include="$(ProjectDir)*.addin"/>
+		</ItemGroup>
+		<Copy DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)"/>
+		<Copy DestinationFolder="$(AppData)\Autodesk\REVIT\Addins\$(RevitVersion)\" SourceFiles="@(SourceManifest)"/>
+	</Target>
+	<Target Name="AfterBuildRelease">
+		<ItemGroup>
+			<SourceDLLs Include="$(TargetDir)\**\*.*"/>
+			<SourceManifest Include="$(ProjectDir)*.addin"/>
+		</ItemGroup>
+		<Message Importance="High" Text="RELEASE copy from $(TargetDir) to $(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\"/>
+		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\$(ProjectName)\%(RecursiveDir)" SourceFiles="@(SourceDLLs)"/>
+		<Copy DestinationFolder="$(SolutionDir)\Release\Release$(RevitVersion)\" SourceFiles="@(SourceManifest)"/>
+	</Target>
 </Project>
